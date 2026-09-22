@@ -1,0 +1,33 @@
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Visual Studio / .NET
+.vs/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+*.user
+*.suo
+*.sln.docstates
+*.userosscache
+*.rsuser
+*.suv
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# ReSharper is a .NET coding add-in
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# Profiler
+*.psess
+*.vsp
+*.vspx
+*.sap
