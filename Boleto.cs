@@ -1,6 +1,6 @@
 namespace TarjetaSUBE;
 
-public class Boleto
+public class Boleto : IBoleto
 {
 
 

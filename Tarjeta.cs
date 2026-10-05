@@ -1,6 +1,6 @@
 namespace TarjetaSUBE;
 
-public class Tarjeta
+public class Tarjeta : ITarjeta
 {
     
 

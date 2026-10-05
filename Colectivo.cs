@@ -1,8 +1,8 @@
 namespace TarjetaSUBE;
 
-public class Colectivo
+public class Colectivo : IColectivo
 {
-    public int Id { get; }
-    public string Linea { get; private set; }
+   
 
 }
+
