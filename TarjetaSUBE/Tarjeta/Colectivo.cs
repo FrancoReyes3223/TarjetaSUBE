@@ -4,8 +4,8 @@ namespace TarjetaSUBE {
 
     public class Colectivo : IColectivo
     {
-        public int Id { get; }
-        public string Linea { get; }
+        public int Id { get; set; }
+        public string Linea { get; set; }
 
         public Boleto PagarCon(Tarjeta tarjeta)
         {
