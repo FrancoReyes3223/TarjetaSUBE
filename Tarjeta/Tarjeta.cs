@@ -7,6 +7,11 @@ public class Tarjeta : ITarjeta
     public int NumeroTarjeta { get; set; }
     public int Saldo { get; private set; }
 
+    public Tarjeta()
+    {
+        Saldo = 0; 
+    }
+
     public bool RecargarSaldo(int recarga)
     {
         int[] montosPermitidos = { 2000, 3000, 4000, 5000, 8000, 10000, 15000, 20000, 25000, 30000 };
