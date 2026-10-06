@@ -41,6 +41,15 @@ namespace TarjetaSUBE.Tests
 		}
 
 		[Test]
+		public void Modelo_BoletoTieneClaveForaneaATarjeta()
+		{
+			var claveForanea = Db.Model.FindEntityType(typeof(Boleto))!.GetForeignKeys().Single();
+
+			Assert.That(claveForanea.PrincipalEntityType.ClrType, Is.EqualTo(typeof(Tarjeta)));
+			Assert.That(claveForanea.Properties.Single().Name, Is.EqualTo(nameof(Boleto.TarjetaId)));
+		}
+
+		[Test]
 		public void BaseEnMemoria_CadaTestEmpiezaVacia()
 		{
 			Assert.That(Db.Tarjetas.Count(), Is.EqualTo(0));
