@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TarjetaSUBE\Tarjeta\Tarjeta.csproj" />
+    <ProjectReference Include="..\Tarjeta\Tarjeta.csproj" />
   </ItemGroup>
 
 </Project>
