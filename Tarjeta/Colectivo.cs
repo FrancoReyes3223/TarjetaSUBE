@@ -12,7 +12,7 @@ namespace TarjetaSUBE {
             int tarifaBasica = 1580;
             int tarifa = tarjeta.CalcularTarifa(tarifaBasica);
         
-            if (tarjeta.Saldo >= tarifa)
+            if (tarjeta.PuedePagar(tarifa))
             {
                 tarjeta.DescontarSaldo(tarifa);
 
