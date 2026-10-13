@@ -9,7 +9,8 @@ namespace TarjetaSUBE {
 
         public Boleto PagarCon(Tarjeta tarjeta)
         {
-            int tarifa = 1580;
+            int tarifaBasica = 1580;
+            int tarifa = tarjeta.CalcularTarifa(tarifaBasica);
         
             if (tarjeta.Saldo >= tarifa)
             {
