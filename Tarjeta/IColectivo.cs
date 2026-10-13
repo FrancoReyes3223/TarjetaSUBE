@@ -5,7 +5,7 @@ namespace TarjetaSUBE
         int Id { get; }
         string Linea { get; }
 
-        Boleto PagarCon(Tarjeta tarjeta);
+        bool PagarCon(Tarjeta tarjeta);
 
     }
 }
