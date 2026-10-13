@@ -96,14 +96,12 @@ namespace TarjetaSUBE.Tests
 		[Test]
 		public void PagarCon_FranquiciaCompleta_SiemprePuedePagarInclusoConSaldoCero()
 		{
-			// Requisito: "Escribir un test que valide que una tarjeta de FranquiciaCompleta siempre puede pagar un boleto"
 			var tarjeta = new Tarjeta
 			{
 				Id = 10,
 				NumeroTarjeta = "10101010",
-				TarjetaTipo = TarjetaTipo.FranquiciaCompleta
+				TarjetaTipo = new TarjetaTipo("Franquicia completa", 0)
 			};
-			// La tarjeta arranca con saldo $0
 
 			var colectivo = new Colectivo();
 			Boleto boleto = colectivo.PagarCon(tarjeta);
@@ -116,12 +114,11 @@ namespace TarjetaSUBE.Tests
 		[Test]
 		public void PagarCon_MedioBoletoEstudiantil_MontoDelBoletoEsLaMitadDelNormal()
 		{
-			// Requisito: "Escribir un test que valide que el monto del boleto pagado con medio boleto es siempre la mitad del normal"
 			var tarjetaNormal = new Tarjeta
 			{
 				Id = 20,
 				NumeroTarjeta = "20202020",
-				TarjetaTipo = TarjetaTipo.Normal
+				TarjetaTipo = new TarjetaTipo("Normal", 100)
 			};
 			tarjetaNormal.RecargarSaldo(2000);
 
@@ -129,7 +126,7 @@ namespace TarjetaSUBE.Tests
 			{
 				Id = 21,
 				NumeroTarjeta = "21212121",
-				TarjetaTipo = TarjetaTipo.MedioBoletoEstudiantil
+				TarjetaTipo = new TarjetaTipo("Medio boleto estudiantil", 50)
 			};
 			tarjetaMedio.RecargarSaldo(2000);
 
@@ -152,7 +149,7 @@ namespace TarjetaSUBE.Tests
 			{
 				Id = 30,
 				NumeroTarjeta = "30303030",
-				TarjetaTipo = TarjetaTipo.BoletoGratuitoEstudiantil
+				TarjetaTipo = new TarjetaTipo("Boleto gratuito estudiantil", 0)
 			};
 
 			var colectivo = new Colectivo();
@@ -165,8 +162,7 @@ namespace TarjetaSUBE.Tests
 		[Test]
 		public void TarjetaTipo_NuevoTipoSinCrearClase_CalculaTarifaCorrectamente()
 		{
-			// Requisito: "Agregar un tipo de tarjeta nuevo no debe requerir crear una clase nueva"
-			var tipoUniversitario = new TarjetaTipo("Medio boleto universitario", 0.5m);
+			var tipoUniversitario = new TarjetaTipo("Medio boleto universitario", 50);
 			var tarjeta = new Tarjeta { TarjetaTipo = tipoUniversitario };
 
 			int tarifa = tarjeta.CalcularTarifa(1580);

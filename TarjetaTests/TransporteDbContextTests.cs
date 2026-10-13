@@ -52,17 +52,24 @@ namespace TarjetaSUBE.Tests
 		[Test]
 		public void Modelo_TarjetaTieneClaveForaneaATarjetaTipo()
 		{
-			var claveForanea = Db.Model.FindEntityType(typeof(Tarjeta))!
-				.GetForeignKeys()
-				.Single(fk => fk.PrincipalEntityType.ClrType == typeof(TarjetaTipo));
+			Microsoft.EntityFrameworkCore.Metadata.IForeignKey claveForanea = null!;
+			foreach (var fk in Db.Model.FindEntityType(typeof(Tarjeta))!.GetForeignKeys())
+			{
+				if (fk.PrincipalEntityType.ClrType == typeof(TarjetaTipo))
+				{
+					claveForanea = fk;
+					break;
+				}
+			}
 
+			Assert.That(claveForanea, Is.Not.Null);
 			Assert.That(claveForanea.Properties.Single().Name, Is.EqualTo(nameof(Tarjeta.TarjetaTipoId)));
 		}
 
 		[Test]
 		public void Tarjetas_GuardarTarjetaConTipo_QuedaAsociadaCorrectamente()
 		{
-			var tipo = new TarjetaTipo { Nombre = "Medio boleto estudiantil", FactorTarifa = 0.5m };
+			var tipo = new TarjetaTipo { Nombre = "Medio boleto estudiantil", PorcentajeTarifa = 50 };
 			Db.TarjetasTipo.Add(tipo);
 			Db.SaveChanges();
 

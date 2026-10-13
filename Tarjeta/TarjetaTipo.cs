@@ -1,33 +1,27 @@
 namespace TarjetaSUBE
 {
-    public class TarjetaTipo
+    public class TarjetaTipo : ITarjetaTipo
     {
         public int Id { get; set; }
         public string Nombre { get; set; } = string.Empty;
 
-        // FactorTarifa determina que fraccion de la tarifa basica se paga:
-        // 1.0m = 100% (Normal), 0.5m = 50% (Medio boleto), 0.0m = 0% (Gratuito / Franquicia completa)
-        public decimal FactorTarifa { get; set; } = 1.0m;
+        // PorcentajeTarifa indica el porcentaje de la tarifa basica que se abona:
+        // 100 = 100% (Normal), 50 = 50% (Medio boleto), 0 = 0% (Gratuito / Franquicia completa)
+        public int PorcentajeTarifa { get; set; } = 100;
 
         public TarjetaTipo()
         {
         }
 
-        public TarjetaTipo(string nombre, decimal factorTarifa)
+        public TarjetaTipo(string nombre, int porcentajeTarifa)
         {
             Nombre = nombre;
-            FactorTarifa = factorTarifa;
+            PorcentajeTarifa = porcentajeTarifa;
         }
 
         public int CalcularTarifa(int tarifaBasica)
         {
-            return (int)(tarifaBasica * FactorTarifa);
+            return (tarifaBasica * PorcentajeTarifa) / 100;
         }
-
-        // Tipos predefinidos para representar los casos pedidos
-        public static TarjetaTipo Normal => new TarjetaTipo { Id = 1, Nombre = "Normal", FactorTarifa = 1.0m };
-        public static TarjetaTipo MedioBoletoEstudiantil => new TarjetaTipo { Id = 2, Nombre = "Medio boleto estudiantil", FactorTarifa = 0.5m };
-        public static TarjetaTipo BoletoGratuitoEstudiantil => new TarjetaTipo { Id = 3, Nombre = "Boleto gratuito estudiantil", FactorTarifa = 0.0m };
-        public static TarjetaTipo FranquiciaCompleta => new TarjetaTipo { Id = 4, Nombre = "Franquicia completa", FactorTarifa = 0.0m };
     }
 }
