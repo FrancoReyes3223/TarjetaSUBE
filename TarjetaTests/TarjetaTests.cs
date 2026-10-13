@@ -93,5 +93,86 @@ namespace TarjetaSUBE.Tests
 
 		}
 
+		[Test]
+		public void PagarCon_FranquiciaCompleta_SiemprePuedePagarInclusoConSaldoCero()
+		{
+			// Requisito: "Escribir un test que valide que una tarjeta de FranquiciaCompleta siempre puede pagar un boleto"
+			var tarjeta = new Tarjeta
+			{
+				Id = 10,
+				NumeroTarjeta = "10101010",
+				TarjetaTipo = TarjetaTipo.FranquiciaCompleta
+			};
+			// La tarjeta arranca con saldo $0
+
+			var colectivo = new Colectivo();
+			Boleto boleto = colectivo.PagarCon(tarjeta);
+
+			Assert.That(boleto, Is.Not.Null);
+			Assert.That(boleto.TarifaBasica, Is.EqualTo(0));
+			Assert.That(tarjeta.Saldo, Is.EqualTo(0));
+		}
+
+		[Test]
+		public void PagarCon_MedioBoletoEstudiantil_MontoDelBoletoEsLaMitadDelNormal()
+		{
+			// Requisito: "Escribir un test que valide que el monto del boleto pagado con medio boleto es siempre la mitad del normal"
+			var tarjetaNormal = new Tarjeta
+			{
+				Id = 20,
+				NumeroTarjeta = "20202020",
+				TarjetaTipo = TarjetaTipo.Normal
+			};
+			tarjetaNormal.RecargarSaldo(2000);
+
+			var tarjetaMedio = new Tarjeta
+			{
+				Id = 21,
+				NumeroTarjeta = "21212121",
+				TarjetaTipo = TarjetaTipo.MedioBoletoEstudiantil
+			};
+			tarjetaMedio.RecargarSaldo(2000);
+
+			var colectivo = new Colectivo();
+
+			Boleto boletoNormal = colectivo.PagarCon(tarjetaNormal);
+			Boleto boletoMedio = colectivo.PagarCon(tarjetaMedio);
+
+			Assert.That(boletoNormal, Is.Not.Null);
+			Assert.That(boletoMedio, Is.Not.Null);
+			Assert.That(boletoMedio.TarifaBasica, Is.EqualTo(boletoNormal.TarifaBasica / 2));
+			Assert.That(boletoMedio.TarifaBasica, Is.EqualTo(790));
+			Assert.That(tarjetaMedio.Saldo, Is.EqualTo(2000 - 790));
+		}
+
+		[Test]
+		public void PagarCon_BoletoGratuitoEstudiantil_GeneraBoletoConMontoCero()
+		{
+			var tarjeta = new Tarjeta
+			{
+				Id = 30,
+				NumeroTarjeta = "30303030",
+				TarjetaTipo = TarjetaTipo.BoletoGratuitoEstudiantil
+			};
+
+			var colectivo = new Colectivo();
+			Boleto boleto = colectivo.PagarCon(tarjeta);
+
+			Assert.That(boleto, Is.Not.Null);
+			Assert.That(boleto.TarifaBasica, Is.EqualTo(0));
+		}
+
+		[Test]
+		public void TarjetaTipo_NuevoTipoSinCrearClase_CalculaTarifaCorrectamente()
+		{
+			// Requisito: "Agregar un tipo de tarjeta nuevo no debe requerir crear una clase nueva"
+			var tipoUniversitario = new TarjetaTipo("Medio boleto universitario", 0.5m);
+			var tarjeta = new Tarjeta { TarjetaTipo = tipoUniversitario };
+
+			int tarifa = tarjeta.CalcularTarifa(1580);
+
+			Assert.That(tarifa, Is.EqualTo(790));
+		}
+
 	}
 }

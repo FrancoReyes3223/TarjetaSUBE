@@ -50,10 +50,42 @@ namespace TarjetaSUBE.Tests
 		}
 
 		[Test]
+		public void Modelo_TarjetaTieneClaveForaneaATarjetaTipo()
+		{
+			var claveForanea = Db.Model.FindEntityType(typeof(Tarjeta))!
+				.GetForeignKeys()
+				.Single(fk => fk.PrincipalEntityType.ClrType == typeof(TarjetaTipo));
+
+			Assert.That(claveForanea.Properties.Single().Name, Is.EqualTo(nameof(Tarjeta.TarjetaTipoId)));
+		}
+
+		[Test]
+		public void Tarjetas_GuardarTarjetaConTipo_QuedaAsociadaCorrectamente()
+		{
+			var tipo = new TarjetaTipo { Nombre = "Medio boleto estudiantil", FactorTarifa = 0.5m };
+			Db.TarjetasTipo.Add(tipo);
+			Db.SaveChanges();
+
+			var tarjeta = new Tarjeta
+			{
+				NumeroTarjeta = "12345678",
+				TarjetaTipoId = tipo.Id
+			};
+			Db.Tarjetas.Add(tarjeta);
+			Db.SaveChanges();
+
+			var guardada = Db.Tarjetas.Find(tarjeta.Id);
+
+			Assert.That(guardada, Is.Not.Null);
+			Assert.That(guardada!.TarjetaTipoId, Is.EqualTo(tipo.Id));
+		}
+
+		[Test]
 		public void BaseEnMemoria_CadaTestEmpiezaVacia()
 		{
 			Assert.That(Db.Tarjetas.Count(), Is.EqualTo(0));
 			Assert.That(Db.Boletos.Count(), Is.EqualTo(0));
+			Assert.That(Db.TarjetasTipo.Count(), Is.EqualTo(0));
 		}
 	}
 }
