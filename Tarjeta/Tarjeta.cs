@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace TarjetaSUBE 
@@ -13,6 +14,8 @@ namespace TarjetaSUBE
 
         public int TarjetaTipoId { get; set; }
         public TarjetaTipo? TarjetaTipo { get; set; }
+
+        public List<Boleto> Boletos { get; set; } = new List<Boleto>();
 
         public Tarjeta()
         {

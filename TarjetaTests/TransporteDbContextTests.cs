@@ -30,9 +30,12 @@ namespace TarjetaSUBE.Tests
 			Db.Tarjetas.Add(tarjeta);
 			Db.SaveChanges();
 
-			var boleto = new Colectivo().PagarCon(tarjeta);
-			Db.Boletos.Add(boleto);
+			// No hace falta agregar el boleto a mano: al guardar la tarjeta,
+			// EF guarda tambien los boletos nuevos de tarjeta.Boletos.
+			bool pago = new Colectivo().PagarCon(tarjeta);
 			Db.SaveChanges();
+
+			Assert.That(pago, Is.True);
 
 			var boletosDeLaTarjeta = Db.Boletos.Where(b => b.TarjetaId == tarjeta.Id).ToList();
 
