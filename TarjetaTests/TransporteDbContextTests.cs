@@ -50,10 +50,49 @@ namespace TarjetaSUBE.Tests
 		}
 
 		[Test]
+		public void Modelo_TarjetaTieneClaveForaneaATarjetaTipo()
+		{
+			Microsoft.EntityFrameworkCore.Metadata.IForeignKey claveForanea = null!;
+			foreach (var fk in Db.Model.FindEntityType(typeof(Tarjeta))!.GetForeignKeys())
+			{
+				if (fk.PrincipalEntityType.ClrType == typeof(TarjetaTipo))
+				{
+					claveForanea = fk;
+					break;
+				}
+			}
+
+			Assert.That(claveForanea, Is.Not.Null);
+			Assert.That(claveForanea.Properties.Single().Name, Is.EqualTo(nameof(Tarjeta.TarjetaTipoId)));
+		}
+
+		[Test]
+		public void Tarjetas_GuardarTarjetaConTipo_QuedaAsociadaCorrectamente()
+		{
+			var tipo = new TarjetaTipo { Nombre = "Medio boleto estudiantil", PorcentajeTarifa = 50 };
+			Db.TarjetasTipo.Add(tipo);
+			Db.SaveChanges();
+
+			var tarjeta = new Tarjeta
+			{
+				NumeroTarjeta = "12345678",
+				TarjetaTipoId = tipo.Id
+			};
+			Db.Tarjetas.Add(tarjeta);
+			Db.SaveChanges();
+
+			var guardada = Db.Tarjetas.Find(tarjeta.Id);
+
+			Assert.That(guardada, Is.Not.Null);
+			Assert.That(guardada!.TarjetaTipoId, Is.EqualTo(tipo.Id));
+		}
+
+		[Test]
 		public void BaseEnMemoria_CadaTestEmpiezaVacia()
 		{
 			Assert.That(Db.Tarjetas.Count(), Is.EqualTo(0));
 			Assert.That(Db.Boletos.Count(), Is.EqualTo(0));
+			Assert.That(Db.TarjetasTipo.Count(), Is.EqualTo(0));
 		}
 	}
 }

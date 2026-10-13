@@ -7,6 +7,7 @@ public class TransporteDbContext(DbContextOptions<TransporteDbContext> options) 
     public DbSet<Tarjeta> Tarjetas => Set<Tarjeta>();
     public DbSet<Colectivo> Colectivos => Set<Colectivo>();
     public DbSet<Boleto> Boletos => Set<Boleto>();
+    public DbSet<TarjetaTipo> TarjetasTipo => Set<TarjetaTipo>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -16,5 +17,11 @@ public class TransporteDbContext(DbContextOptions<TransporteDbContext> options) 
             .HasOne<Tarjeta>()
             .WithMany()
             .HasForeignKey(b => b.TarjetaId);
+
+        // Tarjeta tiene una clave foranea a TarjetaTipo
+        modelBuilder.Entity<Tarjeta>()
+            .HasOne(t => t.TarjetaTipo)
+            .WithMany()
+            .HasForeignKey(t => t.TarjetaTipoId);
     }
 }

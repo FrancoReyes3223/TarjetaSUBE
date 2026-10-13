@@ -11,9 +11,27 @@ namespace TarjetaSUBE
         public string NumeroTarjeta { get; set; }
         public int Saldo { get; private set; }
 
+        public int TarjetaTipoId { get; set; }
+        public TarjetaTipo? TarjetaTipo { get; set; }
+
         public Tarjeta()
         {
             Saldo = 0; 
+        }
+
+        public Tarjeta(TarjetaTipo tipo) : this()
+        {
+            TarjetaTipo = tipo;
+            TarjetaTipoId = tipo.Id;
+        }
+
+        public int CalcularTarifa(int tarifaBasica)
+        {
+            if (TarjetaTipo != null)
+            {
+                return TarjetaTipo.CalcularTarifa(tarifaBasica);
+            }
+            return tarifaBasica;
         }
 
         public bool RecargarSaldo(int recarga)
