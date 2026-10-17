@@ -78,7 +78,7 @@ namespace TarjetaSUBE.Tests
 		}
 
 		[Test]
-		public void PagarCon_ConSaldoInSuficiente_DevuelveNull()
+		public void PagarCon_SuperaElSaldoNegativoPermitido_DevuelveNullYNoDescuenta()
 		{
 
 			var tarjeta = new Tarjeta();
@@ -87,10 +87,66 @@ namespace TarjetaSUBE.Tests
 
 			var colectivo = new Colectivo();
 
+			Boleto viajePlus = colectivo.PagarCon(tarjeta);
+
+			Assert.That(viajePlus, Is.Not.Null);
+			Assert.That(tarjeta.Saldo, Is.EqualTo(-1580));
+
 			Boleto boletoGenerado = colectivo.PagarCon(tarjeta);
 
 			Assert.That(boletoGenerado, Is.Null);
+			Assert.That(tarjeta.Saldo, Is.EqualTo(-1580));
 
+		}
+
+		[Test]
+		public void RecargarSaldo_ConSaldoNegativo_DescuentaLoAdeudado()
+		{
+			var tarjeta = new Tarjeta();
+			new Colectivo().PagarCon(tarjeta);
+
+			bool resultado = tarjeta.RecargarSaldo(2000);
+
+			Assert.That(resultado, Is.True);
+			Assert.That(tarjeta.Saldo, Is.EqualTo(2000 - 1580));
+		}
+
+		[Test]
+		public void PuedePagar_SaldoCero_DevuelveTrue()
+		{
+			var tarjeta = new Tarjeta();
+
+			Assert.That(tarjeta.PuedePagar(1580), Is.True);
+		}
+
+		[Test]
+		public void PuedePagar_QuedariaPorDebajoDelSaldoNegativoPermitido_DevuelveFalse()
+		{
+			var tarjeta = new Tarjeta();
+			tarjeta.DescontarSaldo(1580);
+
+			Assert.That(tarjeta.PuedePagar(1580), Is.False);
+		}
+
+		[Test]
+		public void DescontarSaldo_SaldoCero_QuedaEnNegativo()
+		{
+			var tarjeta = new Tarjeta();
+
+			tarjeta.DescontarSaldo(1580);
+
+			Assert.That(tarjeta.Saldo, Is.EqualTo(-1580));
+		}
+
+		[Test]
+		public void DescontarSaldo_QuedariaPorDebajoDelSaldoNegativoPermitido_NoDescuenta()
+		{
+			var tarjeta = new Tarjeta();
+			tarjeta.DescontarSaldo(1580);
+
+			tarjeta.DescontarSaldo(1580);
+
+			Assert.That(tarjeta.Saldo, Is.EqualTo(-1580));
 		}
 
 		[Test]
