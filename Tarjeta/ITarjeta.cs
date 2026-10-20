@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace TarjetaSUBE
 {
     public interface ITarjeta
@@ -7,6 +9,7 @@ namespace TarjetaSUBE
         int Saldo { get; }
         int TarjetaTipoId { get; }
         TarjetaTipo? TarjetaTipo { get; }
+        List<Boleto> Boletos { get; }
         bool RecargarSaldo(int recarga);
         bool PuedePagar(int monto);
         void DescontarSaldo(int saldoAdescontar);

@@ -55,20 +55,24 @@ namespace TarjetaSUBE.Tests
 		}
 
 		[Test]
-		public void PagarCon_ConSaldoSuficiente_DevuelveBoletoYDescuentaSaldo()
+		public void PagarCon_ConSaldoSuficiente_DevuelveTrueGeneraBoletoYDescuentaSaldo()
 		{
-		
+
 			var tarjeta = new Tarjeta();
 			tarjeta.Id = 1;
 			tarjeta.NumeroTarjeta = "6061267008306639";
 
             tarjeta.RecargarSaldo(3000);
 
-			var colectivo = new Colectivo(); 
+			var colectivo = new Colectivo();
 
-			Boleto boletoGenerado = colectivo.PagarCon(tarjeta);
+			bool pago = colectivo.PagarCon(tarjeta);
 
-			Assert.That(boletoGenerado, Is.Not.Null);
+			Assert.That(pago, Is.True);
+
+			Assert.That(tarjeta.Boletos, Has.Count.EqualTo(1));
+
+			Boleto boletoGenerado = tarjeta.Boletos[0];
 
 			Assert.That(boletoGenerado.TarifaBasica, Is.EqualTo(1580));
 
@@ -78,7 +82,7 @@ namespace TarjetaSUBE.Tests
 		}
 
 		[Test]
-		public void PagarCon_SuperaElSaldoNegativoPermitido_DevuelveNullYNoDescuenta()
+		public void PagarCon_SuperaElSaldoNegativoPermitido_DevuelveFalseYNoGeneraBoleto()
 		{
 
 			var tarjeta = new Tarjeta();
@@ -87,16 +91,37 @@ namespace TarjetaSUBE.Tests
 
 			var colectivo = new Colectivo();
 
-			Boleto viajePlus = colectivo.PagarCon(tarjeta);
+			bool viajePlus = colectivo.PagarCon(tarjeta);
 
-			Assert.That(viajePlus, Is.Not.Null);
+			Assert.That(viajePlus, Is.True);
 			Assert.That(tarjeta.Saldo, Is.EqualTo(-1580));
 
-			Boleto boletoGenerado = colectivo.PagarCon(tarjeta);
+			bool pago = colectivo.PagarCon(tarjeta);
 
-			Assert.That(boletoGenerado, Is.Null);
+			Assert.That(pago, Is.False);
+
+			Assert.That(tarjeta.Boletos, Has.Count.EqualTo(1));
+
 			Assert.That(tarjeta.Saldo, Is.EqualTo(-1580));
 
+		}
+
+		[Test]
+		public void PagarCon_VariosViajes_LaTarjetaAcumulaUnBoletoPorViaje()
+		{
+			var tarjeta = new Tarjeta { Id = 3, NumeroTarjeta = "6061267008306633" };
+			tarjeta.RecargarSaldo(5000);
+
+			var colectivo = new Colectivo();
+
+			Assert.That(colectivo.PagarCon(tarjeta), Is.True);
+			Assert.That(colectivo.PagarCon(tarjeta), Is.True);
+			Assert.That(colectivo.PagarCon(tarjeta), Is.True);
+			Assert.That(colectivo.PagarCon(tarjeta), Is.True);
+			Assert.That(colectivo.PagarCon(tarjeta), Is.False);
+
+			Assert.That(tarjeta.Boletos, Has.Count.EqualTo(4));
+			Assert.That(tarjeta.Saldo, Is.EqualTo(5000 - 4 * 1580));
 		}
 
 		[Test]
@@ -160,10 +185,11 @@ namespace TarjetaSUBE.Tests
 			};
 
 			var colectivo = new Colectivo();
-			Boleto boleto = colectivo.PagarCon(tarjeta);
+			bool pago = colectivo.PagarCon(tarjeta);
 
-			Assert.That(boleto, Is.Not.Null);
-			Assert.That(boleto.TarifaBasica, Is.EqualTo(0));
+			Assert.That(pago, Is.True);
+			Assert.That(tarjeta.Boletos, Has.Count.EqualTo(1));
+			Assert.That(tarjeta.Boletos[0].TarifaBasica, Is.EqualTo(0));
 			Assert.That(tarjeta.Saldo, Is.EqualTo(0));
 		}
 
@@ -188,11 +214,12 @@ namespace TarjetaSUBE.Tests
 
 			var colectivo = new Colectivo();
 
-			Boleto boletoNormal = colectivo.PagarCon(tarjetaNormal);
-			Boleto boletoMedio = colectivo.PagarCon(tarjetaMedio);
+			Assert.That(colectivo.PagarCon(tarjetaNormal), Is.True);
+			Assert.That(colectivo.PagarCon(tarjetaMedio), Is.True);
 
-			Assert.That(boletoNormal, Is.Not.Null);
-			Assert.That(boletoMedio, Is.Not.Null);
+			Boleto boletoNormal = tarjetaNormal.Boletos[0];
+			Boleto boletoMedio = tarjetaMedio.Boletos[0];
+
 			Assert.That(boletoMedio.TarifaBasica, Is.EqualTo(boletoNormal.TarifaBasica / 2));
 			Assert.That(boletoMedio.TarifaBasica, Is.EqualTo(790));
 			Assert.That(tarjetaMedio.Saldo, Is.EqualTo(2000 - 790));
@@ -209,10 +236,11 @@ namespace TarjetaSUBE.Tests
 			};
 
 			var colectivo = new Colectivo();
-			Boleto boleto = colectivo.PagarCon(tarjeta);
+			bool pago = colectivo.PagarCon(tarjeta);
 
-			Assert.That(boleto, Is.Not.Null);
-			Assert.That(boleto.TarifaBasica, Is.EqualTo(0));
+			Assert.That(pago, Is.True);
+			Assert.That(tarjeta.Boletos, Has.Count.EqualTo(1));
+			Assert.That(tarjeta.Boletos[0].TarifaBasica, Is.EqualTo(0));
 		}
 
 		[Test]
