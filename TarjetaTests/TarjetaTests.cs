@@ -82,7 +82,7 @@ namespace TarjetaSUBE.Tests
 		}
 
 		[Test]
-		public void PagarCon_ConSaldoInSuficiente_DevuelveFalseYNoGeneraBoleto()
+		public void PagarCon_SuperaElSaldoNegativoPermitido_DevuelveFalseYNoGeneraBoleto()
 		{
 
 			var tarjeta = new Tarjeta();
@@ -91,13 +91,18 @@ namespace TarjetaSUBE.Tests
 
 			var colectivo = new Colectivo();
 
+			bool viajePlus = colectivo.PagarCon(tarjeta);
+
+			Assert.That(viajePlus, Is.True);
+			Assert.That(tarjeta.Saldo, Is.EqualTo(-1580));
+
 			bool pago = colectivo.PagarCon(tarjeta);
 
 			Assert.That(pago, Is.False);
 
-			Assert.That(tarjeta.Boletos, Is.Empty);
+			Assert.That(tarjeta.Boletos, Has.Count.EqualTo(1));
 
-			Assert.That(tarjeta.Saldo, Is.EqualTo(0));
+			Assert.That(tarjeta.Saldo, Is.EqualTo(-1580));
 
 		}
 
@@ -112,10 +117,61 @@ namespace TarjetaSUBE.Tests
 			Assert.That(colectivo.PagarCon(tarjeta), Is.True);
 			Assert.That(colectivo.PagarCon(tarjeta), Is.True);
 			Assert.That(colectivo.PagarCon(tarjeta), Is.True);
+			Assert.That(colectivo.PagarCon(tarjeta), Is.True);
 			Assert.That(colectivo.PagarCon(tarjeta), Is.False);
 
-			Assert.That(tarjeta.Boletos, Has.Count.EqualTo(3));
-			Assert.That(tarjeta.Saldo, Is.EqualTo(5000 - 3 * 1580));
+			Assert.That(tarjeta.Boletos, Has.Count.EqualTo(4));
+			Assert.That(tarjeta.Saldo, Is.EqualTo(5000 - 4 * 1580));
+		}
+
+		[Test]
+		public void RecargarSaldo_ConSaldoNegativo_DescuentaLoAdeudado()
+		{
+			var tarjeta = new Tarjeta();
+			new Colectivo().PagarCon(tarjeta);
+
+			bool resultado = tarjeta.RecargarSaldo(2000);
+
+			Assert.That(resultado, Is.True);
+			Assert.That(tarjeta.Saldo, Is.EqualTo(2000 - 1580));
+		}
+
+		[Test]
+		public void PuedePagar_SaldoCero_DevuelveTrue()
+		{
+			var tarjeta = new Tarjeta();
+
+			Assert.That(tarjeta.PuedePagar(1580), Is.True);
+		}
+
+		[Test]
+		public void PuedePagar_QuedariaPorDebajoDelSaldoNegativoPermitido_DevuelveFalse()
+		{
+			var tarjeta = new Tarjeta();
+			tarjeta.DescontarSaldo(1580);
+
+			Assert.That(tarjeta.PuedePagar(1580), Is.False);
+		}
+
+		[Test]
+		public void DescontarSaldo_SaldoCero_QuedaEnNegativo()
+		{
+			var tarjeta = new Tarjeta();
+
+			tarjeta.DescontarSaldo(1580);
+
+			Assert.That(tarjeta.Saldo, Is.EqualTo(-1580));
+		}
+
+		[Test]
+		public void DescontarSaldo_QuedariaPorDebajoDelSaldoNegativoPermitido_NoDescuenta()
+		{
+			var tarjeta = new Tarjeta();
+			tarjeta.DescontarSaldo(1580);
+
+			tarjeta.DescontarSaldo(1580);
+
+			Assert.That(tarjeta.Saldo, Is.EqualTo(-1580));
 		}
 
 		[Test]

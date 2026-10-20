@@ -11,6 +11,7 @@ namespace TarjetaSUBE
         TarjetaTipo? TarjetaTipo { get; }
         List<Boleto> Boletos { get; }
         bool RecargarSaldo(int recarga);
+        bool PuedePagar(int monto);
         void DescontarSaldo(int saldoAdescontar);
         int CalcularTarifa(int tarifaBasica);
 

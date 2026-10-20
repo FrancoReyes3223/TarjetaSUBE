@@ -8,6 +8,8 @@ namespace TarjetaSUBE
     // : (2000, 3000, 4000, 5000, 8000, 10000, 15000, 20000, 25000, 30000)
     public class Tarjeta : ITarjeta
     {
+        public const int SaldoNegativoPermitido = -2000;
+
         public int Id { get; set; }
         public string NumeroTarjeta { get; set; }
         public int Saldo { get; private set; }
@@ -53,9 +55,14 @@ namespace TarjetaSUBE
             return true;
         }
 
+        public bool PuedePagar(int monto)
+        {
+            return Saldo - monto >= SaldoNegativoPermitido;
+        }
+
         public void DescontarSaldo(int saldoAdescontar)
         {
-            if (Saldo < saldoAdescontar) 
+            if (!PuedePagar(saldoAdescontar))
                 return;
 
             Saldo -= saldoAdescontar;
