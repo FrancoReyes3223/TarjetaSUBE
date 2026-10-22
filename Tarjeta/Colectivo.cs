@@ -7,11 +7,12 @@ namespace TarjetaSUBE {
         public int Id { get; set; }
         public string Linea { get; set; }
 
-        public Boleto PagarCon(Tarjeta tarjeta)
+        public bool PagarCon(Tarjeta tarjeta)
         {
-            int tarifa = 1580;
-        
-            if (tarjeta.Saldo >= tarifa)
+            int tarifaBasica = 1580;
+            int tarifa = tarjeta.CalcularTarifa(tarifaBasica);
+
+            if (tarjeta.PuedePagar(tarifa))
             {
                 tarjeta.DescontarSaldo(tarifa);
 
@@ -19,13 +20,15 @@ namespace TarjetaSUBE {
                 {
                     TarifaBasica = tarifa,
                     FechayHora = DateTime.Now,
-                    TarjetaId = tarjeta.Id  
+                    TarjetaId = tarjeta.Id
                 };
 
-                return nuevoBoleto; 
+                tarjeta.Boletos.Add(nuevoBoleto);
+
+                return true;
             }
 
-            return null;
+            return false;
         }
     }
 }
