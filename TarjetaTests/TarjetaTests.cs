@@ -189,7 +189,7 @@ namespace TarjetaSUBE.Tests
 
 			Assert.That(pago, Is.True);
 			Assert.That(tarjeta.Boletos, Has.Count.EqualTo(1));
-			Assert.That(tarjeta.Boletos[0].TarifaBasica, Is.EqualTo(0));
+			Assert.That(tarjeta.Boletos[0].TotalAbonado, Is.EqualTo(0));
 			Assert.That(tarjeta.Saldo, Is.EqualTo(0));
 		}
 
@@ -220,8 +220,8 @@ namespace TarjetaSUBE.Tests
 			Boleto boletoNormal = tarjetaNormal.Boletos[0];
 			Boleto boletoMedio = tarjetaMedio.Boletos[0];
 
-			Assert.That(boletoMedio.TarifaBasica, Is.EqualTo(boletoNormal.TarifaBasica / 2));
-			Assert.That(boletoMedio.TarifaBasica, Is.EqualTo(790));
+			Assert.That(boletoMedio.TotalAbonado, Is.EqualTo(boletoNormal.TotalAbonado / 2));
+			Assert.That(boletoMedio.TotalAbonado, Is.EqualTo(790));
 			Assert.That(tarjetaMedio.Saldo, Is.EqualTo(2000 - 790));
 		}
 
@@ -240,7 +240,7 @@ namespace TarjetaSUBE.Tests
 
 			Assert.That(pago, Is.True);
 			Assert.That(tarjeta.Boletos, Has.Count.EqualTo(1));
-			Assert.That(tarjeta.Boletos[0].TarifaBasica, Is.EqualTo(0));
+			Assert.That(tarjeta.Boletos[0].TotalAbonado, Is.EqualTo(0));
 		}
 
 		[Test]

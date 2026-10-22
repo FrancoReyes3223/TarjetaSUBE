@@ -8,6 +8,10 @@ namespace TarjetaSUBE
         DateTime FechayHora { get; }
         int TarifaBasica { get; }
         int TarjetaId { get; }
+        string TipoTarjeta { get; }
+        string LineaColectivo { get; }
+        int TotalAbonado { get; }
+        int SaldoRestante { get; }
 
     }
 

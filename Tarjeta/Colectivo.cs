@@ -18,9 +18,13 @@ namespace TarjetaSUBE {
 
                 Boleto nuevoBoleto = new Boleto
                 {
-                    TarifaBasica = tarifa,
+                    TarifaBasica = tarifaBasica,
                     FechayHora = DateTime.Now,
-                    TarjetaId = tarjeta.Id
+                    TarjetaId = tarjeta.Id,
+                    TipoTarjeta = tarjeta.TarjetaTipo?.Nombre ?? "Normal",
+                    LineaColectivo = Linea,
+                    TotalAbonado = tarifa,
+                    SaldoRestante = tarjeta.Saldo
                 };
 
                 tarjeta.Boletos.Add(nuevoBoleto);
