@@ -4,8 +4,6 @@ using System.Linq;
 
 namespace TarjetaSUBE 
 { 
-
-    // : (2000, 3000, 4000, 5000, 8000, 10000, 15000, 20000, 25000, 30000)
     public class Tarjeta : ITarjeta
     {
         public const int SaldoNegativoPermitido = -2000;
@@ -30,9 +28,9 @@ namespace TarjetaSUBE
             TarjetaTipoId = tipo.Id;
         }
 
-        public int CalcularTarifa(int tarifaBasica, DateTime fechaHora) //nuevo metodo overload de calcularTarifa, teniendo en cuenta el DateTime
+        public int CalcularTarifa(int tarifaBasica, DateTime fechaHora)
         {
-            if (EsMedioBoleto)
+            if (EsMedioBoleto())
             {
                 int viajesHoy = 0;
                 foreach (var boleto in Boletos)
@@ -42,8 +40,9 @@ namespace TarjetaSUBE
                         viajesHoy++;
 
                         if (viajesHoy >= 2)
+                        {
                             return tarifaBasica;
-
+                        }
                     }
                 }
             }
@@ -88,17 +87,19 @@ namespace TarjetaSUBE
             Saldo -= saldoAdescontar;
         }
 
-        public bool EsMedioBoleto
+        public bool EsMedioBoleto()
         {
-            get
+            if (TarjetaTipo != null && TarjetaTipo.PorcentajeTarifa == 50)
             {
-                return TarjetaTipo != null && TarjetaTipo.PorcentajeTarifa == 50;
+                return true;
             }
+
+            return false;
         }
 
         public bool PasaronCincoMinutos(DateTime fechaHora)
         {
-            if (!EsMedioBoleto || Boletos.Count == 0)
+            if (!EsMedioBoleto() || Boletos.Count == 0)
             {
                 return true;
             }
@@ -108,7 +109,5 @@ namespace TarjetaSUBE
 
             return tiempoPasado.TotalMinutes >= 5;
         }
-
-       
     }
 }

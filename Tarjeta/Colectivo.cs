@@ -4,36 +4,11 @@ namespace TarjetaSUBE {
 
     public class Colectivo : IColectivo
     {
+        public const int TarifaBasica = 1580;
+
         public int Id { get; set; }
         public string Linea { get; set; }
 
-        public bool PagarCon(Tarjeta tarjeta)
-        {
-            int tarifaBasica = 1580;
-            int tarifa = tarjeta.CalcularTarifa(tarifaBasica);
-
-            if (tarjeta.PuedePagar(tarifa) && tarjeta.LimiteDeTiempo?quetengo que fijarme en la lista?)
-            {
-                tarjeta.DescontarSaldo(tarifa);
-
-                Boleto nuevoBoleto = new Boleto
-                {
-                    TarifaBasica = tarifaBasica,
-                    FechayHora = DateTime.Now,
-                    TarjetaId = tarjeta.Id,
-                    TipoTarjeta = tarjeta.TarjetaTipo?.Nombre ?? "Normal",
-                    LineaColectivo = Linea,
-                    TotalAbonado = tarifa,
-                    SaldoRestante = tarjeta.Saldo
-                };
-
-                tarjeta.Boletos.Add(nuevoBoleto);
-
-                return true;
-            }
-
-            return false;
-        }
         public bool PagarCon(Tarjeta tarjeta)
         {
             return PagarCon(tarjeta, DateTime.Now);
@@ -46,7 +21,7 @@ namespace TarjetaSUBE {
                 return false;
             }
 
-            int tarifa = tarjeta.CalcularTarifa(1580, fechaHora);
+            int tarifa = tarjeta.CalcularTarifa(TarifaBasica, fechaHora);
 
             if (tarjeta.PuedePagar(tarifa))
             {
@@ -54,9 +29,13 @@ namespace TarjetaSUBE {
 
                 Boleto nuevoBoleto = new Boleto
                 {
-                    TarifaBasica = tarifa,
+                    TarifaBasica = TarifaBasica,
                     FechayHora = fechaHora,
-                    TarjetaId = tarjeta.Id
+                    TarjetaId = tarjeta.Id,
+                    TipoTarjeta = tarjeta.TarjetaTipo?.Nombre ?? "Normal",
+                    LineaColectivo = Linea,
+                    TotalAbonado = tarifa,
+                    SaldoRestante = tarjeta.Saldo
                 };
 
                 tarjeta.Boletos.Add(nuevoBoleto);
@@ -67,4 +46,3 @@ namespace TarjetaSUBE {
         }
     }
 }
-
