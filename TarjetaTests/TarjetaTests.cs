@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using TarjetaSUBE; 
 
@@ -252,6 +253,67 @@ namespace TarjetaSUBE.Tests
 			int tarifa = tarjeta.CalcularTarifa(1580);
 
 			Assert.That(tarifa, Is.EqualTo(790));
+		}
+
+		[Test]
+		public void PagarCon_MedioBoleto_NoPermiteViajarAntesDePasarCincoMinutos()
+		{
+			var tarjeta = new Tarjeta
+			{
+				Id = 40,
+				NumeroTarjeta = "40404040",
+				TarjetaTipo = new TarjetaTipo("Medio boleto estudiantil", 50)
+			};
+			tarjeta.RecargarSaldo(3000);
+
+			var colectivo = new Colectivo();
+			DateTime fechaInicial = new DateTime(2026, 10, 24, 10, 0, 0);
+
+			// 1° viaje a las 10:00 hs -> Permitido
+			bool primerViaje = colectivo.PagarCon(tarjeta, fechaInicial);
+			Assert.That(primerViaje, Is.True);
+
+			// Intento a las 10:03 hs (pasaron 3 minutos) -> Rechazado
+			bool viajeAntesDeCincoMinutos = colectivo.PagarCon(tarjeta, fechaInicial.AddMinutes(3));
+			Assert.That(viajeAntesDeCincoMinutos, Is.False);
+			Assert.That(tarjeta.Boletos, Has.Count.EqualTo(1));
+
+			// Intento a las 10:06 hs (pasaron más de 5 minutos) -> Permitido
+			bool viajePasadosCincoMinutos = colectivo.PagarCon(tarjeta, fechaInicial.AddMinutes(6));
+			Assert.That(viajePasadosCincoMinutos, Is.True);
+			Assert.That(tarjeta.Boletos, Has.Count.EqualTo(2));
+		}
+
+		[Test]
+		public void PagarCon_MedioBoleto_NoPermiteMasDeDosMedioBoletosPorDiaYTercerViajeCobraNormal()
+		{
+			var tarjeta = new Tarjeta
+			{
+				Id = 41,
+				NumeroTarjeta = "41414141",
+				TarjetaTipo = new TarjetaTipo("Medio boleto estudiantil", 50)
+			};
+			tarjeta.RecargarSaldo(5000);
+
+			var colectivo = new Colectivo();
+			DateTime fechaHoy = new DateTime(2026, 10, 24, 8, 0, 0);
+
+			// 1° viaje del día -> Medio boleto ($790)
+			Assert.That(colectivo.PagarCon(tarjeta, fechaHoy), Is.True);
+			Assert.That(tarjeta.Boletos[0].TotalAbonado, Is.EqualTo(790));
+
+			// 2° viaje del día (10 minutos después) -> Medio boleto ($790)
+			Assert.That(colectivo.PagarCon(tarjeta, fechaHoy.AddMinutes(10)), Is.True);
+			Assert.That(tarjeta.Boletos[1].TotalAbonado, Is.EqualTo(790));
+
+			// 3° viaje del mismo día (20 minutos después) -> Se cobra tarifa normal ($1580)
+			Assert.That(colectivo.PagarCon(tarjeta, fechaHoy.AddMinutes(20)), Is.True);
+			Assert.That(tarjeta.Boletos[2].TotalAbonado, Is.EqualTo(1580));
+
+			// Al día siguiente vuelve a tener medio boleto disponible ($790)
+			DateTime diaSiguiente = fechaHoy.AddDays(1);
+			Assert.That(colectivo.PagarCon(tarjeta, diaSiguiente), Is.True);
+			Assert.That(tarjeta.Boletos[3].TotalAbonado, Is.EqualTo(790));
 		}
 
 	}
