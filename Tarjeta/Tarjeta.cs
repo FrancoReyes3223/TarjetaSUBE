@@ -30,6 +30,26 @@ namespace TarjetaSUBE
             TarjetaTipoId = tipo.Id;
         }
 
+        public int CalcularTarifa(int tarifaBasica, DateTime fechaHora) //nuevo metodo overload de calcularTarifa, teniendo en cuenta el DateTime
+        {
+            if (EsMedioBoleto)
+            {
+                int viajesHoy = 0;
+                foreach (var boleto in Boletos)
+                {
+                    if (boleto.FechayHora.Date == fechaHora.Date)
+                    {
+                        viajesHoy++;
+
+                        if (viajesHoy >= 2)
+                            return tarifaBasica;
+
+                    }
+                }
+            }
+            return CalcularTarifa(tarifaBasica);
+        }
+
         public int CalcularTarifa(int tarifaBasica)
         {
             if (TarjetaTipo != null)
@@ -68,5 +88,27 @@ namespace TarjetaSUBE
             Saldo -= saldoAdescontar;
         }
 
+        public bool EsMedioBoleto
+        {
+            get
+            {
+                return TarjetaTipo != null && TarjetaTipo.PorcentajeTarifa == 50;
+            }
+        }
+
+        public bool PasaronCincoMinutos(DateTime fechaHora)
+        {
+            if (!EsMedioBoleto || Boletos.Count == 0)
+            {
+                return true;
+            }
+
+            Boleto ultimoBoleto = Boletos[Boletos.Count - 1];
+            TimeSpan tiempoPasado = fechaHora - ultimoBoleto.FechayHora;
+
+            return tiempoPasado.TotalMinutes >= 5;
+        }
+
+       
     }
 }
