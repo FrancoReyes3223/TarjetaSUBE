@@ -107,7 +107,7 @@ namespace TarjetaSUBE
             Boleto ultimoBoleto = Boletos[Boletos.Count - 1];
             TimeSpan tiempoPasado = fechaHora - ultimoBoleto.FechayHora;
 
-            return tiempoPasado.TotalMinutes >= 5;
+            return tiempoPasado.TotalMinutes > 5;
         }
     }
 }
