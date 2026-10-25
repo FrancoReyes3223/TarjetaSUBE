@@ -309,5 +309,59 @@ namespace TarjetaSUBE.Tests
 			Assert.That(tarjeta.Boletos[3].TotalAbonado, Is.EqualTo(790));
 		}
 
+		[Test]
+		public void PagarCon_BoletoGratuitoEstudiantil_NoPermiteMasDeDosViajesGratuitosPorDia()
+		{
+			var tarjeta = new Tarjeta
+			{
+				Id = 50,
+				NumeroTarjeta = "50505050",
+				TarjetaTipo = new TarjetaTipo("Boleto gratuito estudiantil", 0)
+			};
+
+			var colectivo = new Colectivo();
+			DateTime fechaHoy = new DateTime(2026, 10, 25, 9, 0, 0);
+
+			Assert.That(colectivo.PagarCon(tarjeta, fechaHoy), Is.True);
+			Assert.That(tarjeta.Boletos[0].TotalAbonado, Is.EqualTo(0));
+
+			Assert.That(colectivo.PagarCon(tarjeta, fechaHoy.AddMinutes(10)), Is.True);
+			Assert.That(tarjeta.Boletos[1].TotalAbonado, Is.EqualTo(0));
+
+			Assert.That(colectivo.PagarCon(tarjeta, fechaHoy.AddMinutes(20)), Is.True);
+			Assert.That(tarjeta.Boletos[2].TotalAbonado, Is.Not.EqualTo(0));
+			Assert.That(tarjeta.Saldo, Is.EqualTo(-1580));
+
+			Assert.That(colectivo.PagarCon(tarjeta, fechaHoy.AddMinutes(30)), Is.False);
+		}
+
+		[Test]
+		public void PagarCon_BoletoGratuitoEstudiantil_ViajesPosterioresAlSegundoCobraPrecioCompleto()
+		{
+			var tarjeta = new Tarjeta
+			{
+				Id = 51,
+				NumeroTarjeta = "51515151",
+				TarjetaTipo = new TarjetaTipo("Boleto gratuito estudiantil", 0)
+			};
+			tarjeta.RecargarSaldo(5000);
+
+			var colectivo = new Colectivo();
+			DateTime fechaHoy = new DateTime(2026, 10, 25, 9, 0, 0);
+
+			Assert.That(colectivo.PagarCon(tarjeta, fechaHoy), Is.True);
+			Assert.That(tarjeta.Boletos[0].TotalAbonado, Is.EqualTo(0));
+
+			Assert.That(colectivo.PagarCon(tarjeta, fechaHoy.AddMinutes(10)), Is.True);
+			Assert.That(tarjeta.Boletos[1].TotalAbonado, Is.EqualTo(0));
+
+			Assert.That(colectivo.PagarCon(tarjeta, fechaHoy.AddMinutes(20)), Is.True);
+			Assert.That(tarjeta.Boletos[2].TotalAbonado, Is.EqualTo(1580));
+
+			Assert.That(colectivo.PagarCon(tarjeta, fechaHoy.AddMinutes(30)), Is.True);
+			Assert.That(tarjeta.Boletos[3].TotalAbonado, Is.EqualTo(1580));
+			Assert.That(tarjeta.Saldo, Is.EqualTo(5000 - 2 * 1580));
+		}
+
 	}
 }
