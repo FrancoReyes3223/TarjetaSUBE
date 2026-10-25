@@ -30,7 +30,7 @@ namespace TarjetaSUBE
 
         public int CalcularTarifa(int tarifaBasica, DateTime fechaHora)
         {
-            if (EsMedioBoleto())
+            if (TieneLimiteDeViajesDiarios())
             {
                 int viajesHoy = 0;
                 foreach (var boleto in Boletos)
@@ -95,6 +95,34 @@ namespace TarjetaSUBE
             }
 
             return false;
+        }
+
+        public bool TieneLimiteDeViajesDiarios()
+        {
+            if (TarjetaTipo == null)
+            {
+                return false;
+            }
+
+            switch (TarjetaTipo.PorcentajeTarifa)
+            {
+                case 50:
+                    return true;
+
+                case 0:
+                    string nombre = TarjetaTipo.Nombre.Trim().ToLower();
+                    if (nombre == "franquicia completa")
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+
+                default:
+                    return false;
+            }
         }
 
         public bool PasaronCincoMinutos(DateTime fechaHora)

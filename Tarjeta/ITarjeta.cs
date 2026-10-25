@@ -13,6 +13,7 @@ namespace TarjetaSUBE
         List<Boleto> Boletos { get; }
 
         bool EsMedioBoleto();
+        bool TieneLimiteDeViajesDiarios();
         bool RecargarSaldo(int recarga);
         bool PuedePagar(int monto);
         void DescontarSaldo(int saldoAdescontar);
