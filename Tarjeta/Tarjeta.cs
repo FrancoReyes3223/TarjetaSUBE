@@ -111,14 +111,7 @@ namespace TarjetaSUBE
 
                 case 0:
                     string nombre = TarjetaTipo.Nombre.Trim().ToLower();
-                    if (nombre == "franquicia completa")
-                    {
-                        return false;
-                    }
-                    else
-                    {
-                        return true;
-                    }
+                    return (nombre != "franquicia completa");
 
                 default:
                     return false;
