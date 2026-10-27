@@ -4,8 +4,6 @@ using System.Linq;
 
 namespace TarjetaSUBE 
 { 
-
-    // : (2000, 3000, 4000, 5000, 8000, 10000, 15000, 20000, 25000, 30000)
     public class Tarjeta : ITarjeta
     {
         public const int SaldoNegativoPermitido = -2000;
@@ -28,6 +26,27 @@ namespace TarjetaSUBE
         {
             TarjetaTipo = tipo;
             TarjetaTipoId = tipo.Id;
+        }
+
+        public int CalcularTarifa(int tarifaBasica, DateTime fechaHora)
+        {
+            if (TieneLimiteDeViajesDiarios())
+            {
+                int viajesHoy = 0;
+                foreach (var boleto in Boletos)
+                {
+                    if (boleto.FechayHora.Date == fechaHora.Date)
+                    {
+                        viajesHoy++;
+
+                        if (viajesHoy >= 2)
+                        {
+                            return tarifaBasica;
+                        }
+                    }
+                }
+            }
+            return CalcularTarifa(tarifaBasica);
         }
 
         public int CalcularTarifa(int tarifaBasica)
@@ -68,5 +87,48 @@ namespace TarjetaSUBE
             Saldo -= saldoAdescontar;
         }
 
+        public bool EsMedioBoleto()
+        {
+            if (TarjetaTipo != null && TarjetaTipo.PorcentajeTarifa == 50)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool TieneLimiteDeViajesDiarios()
+        {
+            if (TarjetaTipo == null)
+            {
+                return false;
+            }
+
+            switch (TarjetaTipo.PorcentajeTarifa)
+            {
+                case 50:
+                    return true;
+
+                case 0:
+                    string nombre = TarjetaTipo.Nombre.Trim().ToLower();
+                    return (nombre != "franquicia completa");
+
+                default:
+                    return false;
+            }
+        }
+
+        public bool PasaronCincoMinutos(DateTime fechaHora)
+        {
+            if (!EsMedioBoleto() || Boletos.Count == 0)
+            {
+                return true;
+            }
+
+            Boleto ultimoBoleto = Boletos[Boletos.Count - 1];
+            TimeSpan tiempoPasado = fechaHora - ultimoBoleto.FechayHora;
+
+            return tiempoPasado.TotalMinutes > 5;
+        }
     }
 }
