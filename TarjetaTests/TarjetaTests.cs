@@ -309,5 +309,31 @@ namespace TarjetaSUBE.Tests
 			Assert.That(tarjeta.Boletos[3].TotalAbonado, Is.EqualTo(790));
 		}
 
+		[Test]
+		public void RecargarSaldo_SuperaElMaximo_AcreditaHastaElMaximoYDejaElExcedentePendiente()
+		{
+			var tarjeta = new Tarjeta();
+
+			Assert.That(tarjeta.RecargarSaldo(30000), Is.True);
+			Assert.That(tarjeta.RecargarSaldo(30000), Is.True);
+
+			Assert.That(tarjeta.Saldo, Is.EqualTo(Tarjeta.SaldoMaximo));
+			Assert.That(tarjeta.SaldoPendiente, Is.EqualTo(60000 - 56000));
+		}
+
+		[Test]
+		public void PagarCon_ConSaldoPendiente_AcreditaElPendienteHastaElMaximo()
+		{
+			var tarjeta = new Tarjeta();
+			tarjeta.RecargarSaldo(30000);
+			tarjeta.RecargarSaldo(30000);
+
+			bool pago = new Colectivo().PagarCon(tarjeta);
+
+			Assert.That(pago, Is.True);
+			Assert.That(tarjeta.Saldo, Is.EqualTo(Tarjeta.SaldoMaximo));
+			Assert.That(tarjeta.SaldoPendiente, Is.EqualTo(4000 - 1580));
+		}
+
 	}
 }
