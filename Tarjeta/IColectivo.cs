@@ -1,3 +1,5 @@
+using System;
+
 namespace TarjetaSUBE
 {
     public interface IColectivo
@@ -6,6 +8,6 @@ namespace TarjetaSUBE
         string Linea { get; }
 
         bool PagarCon(Tarjeta tarjeta);
-
+        bool PagarCon(Tarjeta tarjeta, DateTime fechaHora);
     }
 }

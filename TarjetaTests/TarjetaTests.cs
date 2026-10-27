@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using TarjetaSUBE; 
 
@@ -189,7 +190,7 @@ namespace TarjetaSUBE.Tests
 
 			Assert.That(pago, Is.True);
 			Assert.That(tarjeta.Boletos, Has.Count.EqualTo(1));
-			Assert.That(tarjeta.Boletos[0].TarifaBasica, Is.EqualTo(0));
+			Assert.That(tarjeta.Boletos[0].TotalAbonado, Is.EqualTo(0));
 			Assert.That(tarjeta.Saldo, Is.EqualTo(0));
 		}
 
@@ -220,8 +221,8 @@ namespace TarjetaSUBE.Tests
 			Boleto boletoNormal = tarjetaNormal.Boletos[0];
 			Boleto boletoMedio = tarjetaMedio.Boletos[0];
 
-			Assert.That(boletoMedio.TarifaBasica, Is.EqualTo(boletoNormal.TarifaBasica / 2));
-			Assert.That(boletoMedio.TarifaBasica, Is.EqualTo(790));
+			Assert.That(boletoMedio.TotalAbonado, Is.EqualTo(boletoNormal.TotalAbonado / 2));
+			Assert.That(boletoMedio.TotalAbonado, Is.EqualTo(790));
 			Assert.That(tarjetaMedio.Saldo, Is.EqualTo(2000 - 790));
 		}
 
@@ -240,7 +241,7 @@ namespace TarjetaSUBE.Tests
 
 			Assert.That(pago, Is.True);
 			Assert.That(tarjeta.Boletos, Has.Count.EqualTo(1));
-			Assert.That(tarjeta.Boletos[0].TarifaBasica, Is.EqualTo(0));
+			Assert.That(tarjeta.Boletos[0].TotalAbonado, Is.EqualTo(0));
 		}
 
 		[Test]
@@ -252,6 +253,86 @@ namespace TarjetaSUBE.Tests
 			int tarifa = tarjeta.CalcularTarifa(1580);
 
 			Assert.That(tarifa, Is.EqualTo(790));
+		}
+
+		[Test]
+		public void PagarCon_MedioBoleto_NoPermiteViajarAntesDePasarCincoMinutos()
+		{
+			var tarjeta = new Tarjeta
+			{
+				Id = 40,
+				NumeroTarjeta = "40404040",
+				TarjetaTipo = new TarjetaTipo("Medio boleto estudiantil", 50)
+			};
+			tarjeta.RecargarSaldo(3000);
+
+			var colectivo = new Colectivo();
+			DateTime fechaInicial = new DateTime(2026, 10, 24, 10, 0, 0);
+
+			bool primerViaje = colectivo.PagarCon(tarjeta, fechaInicial);
+			Assert.That(primerViaje, Is.True);
+
+			bool viajeAntesDeCincoMinutos = colectivo.PagarCon(tarjeta, fechaInicial.AddMinutes(3));
+			Assert.That(viajeAntesDeCincoMinutos, Is.False);
+			Assert.That(tarjeta.Boletos, Has.Count.EqualTo(1));
+
+			bool viajePasadosCincoMinutos = colectivo.PagarCon(tarjeta, fechaInicial.AddMinutes(6));
+			Assert.That(viajePasadosCincoMinutos, Is.True);
+			Assert.That(tarjeta.Boletos, Has.Count.EqualTo(2));
+		}
+
+		[Test]
+		public void PagarCon_MedioBoleto_NoPermiteMasDeDosMedioBoletosPorDiaYTercerViajeCobraNormal()
+		{
+			var tarjeta = new Tarjeta
+			{
+				Id = 41,
+				NumeroTarjeta = "41414141",
+				TarjetaTipo = new TarjetaTipo("Medio boleto estudiantil", 50)
+			};
+			tarjeta.RecargarSaldo(5000);
+
+			var colectivo = new Colectivo();
+			DateTime fechaHoy = new DateTime(2026, 10, 24, 8, 0, 0);
+
+			Assert.That(colectivo.PagarCon(tarjeta, fechaHoy), Is.True);
+			Assert.That(tarjeta.Boletos[0].TotalAbonado, Is.EqualTo(790));
+
+			Assert.That(colectivo.PagarCon(tarjeta, fechaHoy.AddMinutes(10)), Is.True);
+			Assert.That(tarjeta.Boletos[1].TotalAbonado, Is.EqualTo(790));
+
+			Assert.That(colectivo.PagarCon(tarjeta, fechaHoy.AddMinutes(20)), Is.True);
+			Assert.That(tarjeta.Boletos[2].TotalAbonado, Is.EqualTo(1580));
+
+			DateTime diaSiguiente = fechaHoy.AddDays(1);
+			Assert.That(colectivo.PagarCon(tarjeta, diaSiguiente), Is.True);
+			Assert.That(tarjeta.Boletos[3].TotalAbonado, Is.EqualTo(790));
+		}
+
+		[Test]
+		public void RecargarSaldo_SuperaElMaximo_AcreditaHastaElMaximoYDejaElExcedentePendiente()
+		{
+			var tarjeta = new Tarjeta();
+
+			Assert.That(tarjeta.RecargarSaldo(30000), Is.True);
+			Assert.That(tarjeta.RecargarSaldo(30000), Is.True);
+
+			Assert.That(tarjeta.Saldo, Is.EqualTo(Tarjeta.SaldoMaximo));
+			Assert.That(tarjeta.SaldoPendiente, Is.EqualTo(60000 - 56000));
+		}
+
+		[Test]
+		public void PagarCon_ConSaldoPendiente_AcreditaElPendienteHastaElMaximo()
+		{
+			var tarjeta = new Tarjeta();
+			tarjeta.RecargarSaldo(30000);
+			tarjeta.RecargarSaldo(30000);
+
+			bool pago = new Colectivo().PagarCon(tarjeta);
+
+			Assert.That(pago, Is.True);
+			Assert.That(tarjeta.Saldo, Is.EqualTo(Tarjeta.SaldoMaximo));
+			Assert.That(tarjeta.SaldoPendiente, Is.EqualTo(4000 - 1580));
 		}
 
 	}

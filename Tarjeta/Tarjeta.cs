@@ -4,15 +4,15 @@ using System.Linq;
 
 namespace TarjetaSUBE 
 { 
-
-    // : (2000, 3000, 4000, 5000, 8000, 10000, 15000, 20000, 25000, 30000)
     public class Tarjeta : ITarjeta
     {
         public const int SaldoNegativoPermitido = -2000;
+        public const int SaldoMaximo = 56000;
 
         public int Id { get; set; }
         public string NumeroTarjeta { get; set; }
         public int Saldo { get; private set; }
+        public int SaldoPendiente { get; private set; }
 
         public int TarjetaTipoId { get; set; }
         public TarjetaTipo? TarjetaTipo { get; set; }
@@ -28,6 +28,27 @@ namespace TarjetaSUBE
         {
             TarjetaTipo = tipo;
             TarjetaTipoId = tipo.Id;
+        }
+
+        public int CalcularTarifa(int tarifaBasica, DateTime fechaHora)
+        {
+            if (TieneLimiteDeViajesDiarios())
+            {
+                int viajesHoy = 0;
+                foreach (var boleto in Boletos)
+                {
+                    if (boleto.FechayHora.Date == fechaHora.Date)
+                    {
+                        viajesHoy++;
+
+                        if (viajesHoy >= 2)
+                        {
+                            return tarifaBasica;
+                        }
+                    }
+                }
+            }
+            return CalcularTarifa(tarifaBasica);
         }
 
         public int CalcularTarifa(int tarifaBasica)
@@ -47,12 +68,20 @@ namespace TarjetaSUBE
             {
                 return false;
             }
-            if (Saldo + recarga > 40000)
-            {
-                return false;
-            }
-            Saldo += recarga;
+            SaldoPendiente += recarga;
+            AcreditarCarga();
             return true;
+        }
+
+        public void AcreditarCarga()
+        {
+            int acreditar = Math.Min(SaldoMaximo - Saldo, SaldoPendiente);
+
+            if (acreditar > 0)
+            {
+                Saldo += acreditar;
+                SaldoPendiente -= acreditar;
+            }
         }
 
         public bool PuedePagar(int monto)
@@ -66,7 +95,51 @@ namespace TarjetaSUBE
                 return;
 
             Saldo -= saldoAdescontar;
+            AcreditarCarga();
         }
 
+        public bool EsMedioBoleto()
+        {
+            if (TarjetaTipo != null && TarjetaTipo.PorcentajeTarifa == 50)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool TieneLimiteDeViajesDiarios()
+        {
+            if (TarjetaTipo == null)
+            {
+                return false;
+            }
+
+            switch (TarjetaTipo.PorcentajeTarifa)
+            {
+                case 50:
+                    return true;
+
+                case 0:
+                    string nombre = TarjetaTipo.Nombre.Trim().ToLower();
+                    return (nombre != "franquicia completa");
+
+                default:
+                    return false;
+            }
+        }
+
+        public bool PasaronCincoMinutos(DateTime fechaHora)
+        {
+            if (!EsMedioBoleto() || Boletos.Count == 0)
+            {
+                return true;
+            }
+
+            Boleto ultimoBoleto = Boletos[Boletos.Count - 1];
+            TimeSpan tiempoPasado = fechaHora - ultimoBoleto.FechayHora;
+
+            return tiempoPasado.TotalMinutes > 5;
+        }
     }
 }
