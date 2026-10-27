@@ -95,6 +95,7 @@ namespace TarjetaSUBE
                 return;
 
             Saldo -= saldoAdescontar;
+            AcreditarCarga();
         }
 
         public bool EsMedioBoleto()
