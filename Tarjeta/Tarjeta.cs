@@ -7,10 +7,12 @@ namespace TarjetaSUBE
     public class Tarjeta : ITarjeta
     {
         public const int SaldoNegativoPermitido = -2000;
+        public const int SaldoMaximo = 56000;
 
         public int Id { get; set; }
         public string NumeroTarjeta { get; set; }
         public int Saldo { get; private set; }
+        public int SaldoPendiente { get; private set; }
 
         public int TarjetaTipoId { get; set; }
         public TarjetaTipo? TarjetaTipo { get; set; }
@@ -66,12 +68,20 @@ namespace TarjetaSUBE
             {
                 return false;
             }
-            if (Saldo + recarga > 40000)
-            {
-                return false;
-            }
-            Saldo += recarga;
+            SaldoPendiente += recarga;
+            AcreditarCarga();
             return true;
+        }
+
+        public void AcreditarCarga()
+        {
+            int acreditar = Math.Min(SaldoMaximo - Saldo, SaldoPendiente);
+
+            if (acreditar > 0)
+            {
+                Saldo += acreditar;
+                SaldoPendiente -= acreditar;
+            }
         }
 
         public bool PuedePagar(int monto)
