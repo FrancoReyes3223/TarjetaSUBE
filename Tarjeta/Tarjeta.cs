@@ -32,6 +32,11 @@ namespace TarjetaSUBE
 
         public int CalcularTarifa(int tarifaBasica, DateTime fechaHora)
         {
+            if (EsNormal())
+            {
+                return CalcularTarifaUsoFrecuente(tarifaBasica, fechaHora);
+            }
+
             if (TieneLimiteDeViajesDiarios())
             {
                 int viajesHoy = 0;
@@ -49,6 +54,28 @@ namespace TarjetaSUBE
                 }
             }
             return CalcularTarifa(tarifaBasica);
+        }
+
+        public int CalcularTarifaUsoFrecuente(int tarifaBasica, DateTime fechaHora)
+        {
+            int numeroDeViaje = ViajesDelMes(fechaHora) + 1;
+
+            if (numeroDeViaje >= 80)
+            {
+                return tarifaBasica * 75 / 100;
+            }
+
+            if (numeroDeViaje >= 30)
+            {
+                return tarifaBasica * 80 / 100;
+            }
+
+            return tarifaBasica;
+        }
+
+        public int ViajesDelMes(DateTime fechaHora)
+        {
+            return Boletos.Count(b => b.FechayHora.Year == fechaHora.Year && b.FechayHora.Month == fechaHora.Month);
         }
 
         public int CalcularTarifa(int tarifaBasica)
@@ -96,6 +123,11 @@ namespace TarjetaSUBE
 
             Saldo -= saldoAdescontar;
             AcreditarCarga();
+        }
+
+        public bool EsNormal()
+        {
+            return TarjetaTipo == null || TarjetaTipo.PorcentajeTarifa == 100;
         }
 
         public bool EsMedioBoleto()
