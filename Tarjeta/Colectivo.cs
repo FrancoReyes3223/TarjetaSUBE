@@ -18,7 +18,7 @@ namespace TarjetaSUBE {
 
         public bool PagarCon(Tarjeta tarjeta, DateTime fechaHora)
         {
-            if (!tarjeta.PasaronCincoMinutos(fechaHora))
+            if (!tarjeta.PuedeViajar(fechaHora))
             {
                 return false;
             }

@@ -72,7 +72,7 @@ namespace TarjetaSUBE.Tests
 		[Test]
 		public void Tarjetas_GuardarTarjetaConTipo_QuedaAsociadaCorrectamente()
 		{
-			var tipo = new TarjetaTipo { Nombre = "Medio boleto estudiantil", PorcentajeTarifa = 50 };
+			var tipo = new MedioBoleto();
 			Db.TarjetasTipo.Add(tipo);
 			Db.SaveChanges();
 

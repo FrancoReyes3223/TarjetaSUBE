@@ -9,8 +9,6 @@ namespace TarjetaSUBE
         public const int SaldoNegativoPermitido = -2000;
         public const int SaldoMaximo = 56000;
 
-        private static readonly CalculadoraTarifa calculadoraTarifa = new CalculadoraTarifa();
-
         public int Id { get; set; }
         public string NumeroTarjeta { get; set; }
         public int Saldo { get; private set; }
@@ -34,7 +32,7 @@ namespace TarjetaSUBE
 
         private TarjetaTipo ObtenerTipo()
         {
-            return TarjetaTipo ?? new TarjetaTipo("Normal", 100);
+            return TarjetaTipo ?? new Normal();
         }
 
         private HistorialViajes ObtenerHistorial()
@@ -44,12 +42,7 @@ namespace TarjetaSUBE
 
         public int CalcularTarifa(int tarifaBasica, DateTime fechaHora)
         {
-            return calculadoraTarifa.Calcular(ObtenerTipo(), tarifaBasica, ObtenerHistorial(), fechaHora);
-        }
-
-        public int CalcularTarifaUsoFrecuente(int tarifaBasica, DateTime fechaHora)
-        {
-            return calculadoraTarifa.CalcularUsoFrecuente(tarifaBasica, ViajesDelMes(fechaHora) + 1);
+            return ObtenerTipo().CalcularTarifa(tarifaBasica, ObtenerHistorial(), fechaHora);
         }
 
         public int ViajesDelMes(DateTime fechaHora)
@@ -102,22 +95,12 @@ namespace TarjetaSUBE
 
         public bool EsNormal()
         {
-            return ObtenerTipo().EsNormal();
+            return ObtenerTipo() is Normal;
         }
 
-        public bool EsMedioBoleto()
+        public bool PuedeViajar(DateTime fechaHora)
         {
-            return ObtenerTipo().EsMedioBoleto();
-        }
-
-        public bool TieneLimiteDeViajesDiarios()
-        {
-            return ObtenerTipo().TieneLimiteDeViajesDiarios();
-        }
-
-        public bool PasaronCincoMinutos(DateTime fechaHora)
-        {
-            return !EsMedioBoleto() || ObtenerHistorial().PasaronMinutosDesdeUltimoViaje(fechaHora, 5);
+            return ObtenerTipo().PuedeViajar(ObtenerHistorial(), fechaHora);
         }
     }
 }

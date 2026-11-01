@@ -1,3 +1,5 @@
+using System;
+
 namespace TarjetaSUBE
 {
     public interface ITarjetaTipo
@@ -6,8 +8,7 @@ namespace TarjetaSUBE
         string Nombre { get; }
         int PorcentajeTarifa { get; }
         int CalcularTarifa(int tarifaBasica);
-        bool EsNormal();
-        bool EsMedioBoleto();
-        bool TieneLimiteDeViajesDiarios();
+        int CalcularTarifa(int tarifaBasica, HistorialViajes historial, DateTime fechaHora);
+        bool PuedeViajar(HistorialViajes historial, DateTime fechaHora);
     }
 }

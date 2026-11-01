@@ -182,7 +182,7 @@ namespace TarjetaSUBE.Tests
 			{
 				Id = 10,
 				NumeroTarjeta = "10101010",
-				TarjetaTipo = new TarjetaTipo("Franquicia completa", 0)
+				TarjetaTipo = new FranquiciaCompleta()
 			};
 
 			var colectivo = new Colectivo();
@@ -201,7 +201,7 @@ namespace TarjetaSUBE.Tests
 			{
 				Id = 20,
 				NumeroTarjeta = "20202020",
-				TarjetaTipo = new TarjetaTipo("Normal", 100)
+				TarjetaTipo = new Normal()
 			};
 			tarjetaNormal.RecargarSaldo(2000);
 
@@ -209,7 +209,7 @@ namespace TarjetaSUBE.Tests
 			{
 				Id = 21,
 				NumeroTarjeta = "21212121",
-				TarjetaTipo = new TarjetaTipo("Medio boleto estudiantil", 50)
+				TarjetaTipo = new MedioBoleto()
 			};
 			tarjetaMedio.RecargarSaldo(2000);
 
@@ -233,7 +233,7 @@ namespace TarjetaSUBE.Tests
 			{
 				Id = 30,
 				NumeroTarjeta = "30303030",
-				TarjetaTipo = new TarjetaTipo("Boleto gratuito estudiantil", 0)
+				TarjetaTipo = new BoletoGratuito()
 			};
 
 			var colectivo = new Colectivo();
@@ -247,7 +247,7 @@ namespace TarjetaSUBE.Tests
 		[Test]
 		public void TarjetaTipo_NuevoTipoSinCrearClase_CalculaTarifaCorrectamente()
 		{
-			var tipoUniversitario = new TarjetaTipo("Medio boleto universitario", 50);
+			var tipoUniversitario = new MedioBoleto { Nombre = "Medio boleto universitario" };
 			var tarjeta = new Tarjeta { TarjetaTipo = tipoUniversitario };
 
 			int tarifa = tarjeta.CalcularTarifa(1580);
@@ -262,7 +262,7 @@ namespace TarjetaSUBE.Tests
 			{
 				Id = 40,
 				NumeroTarjeta = "40404040",
-				TarjetaTipo = new TarjetaTipo("Medio boleto estudiantil", 50)
+				TarjetaTipo = new MedioBoleto()
 			};
 			tarjeta.RecargarSaldo(3000);
 
@@ -288,7 +288,7 @@ namespace TarjetaSUBE.Tests
 			{
 				Id = 41,
 				NumeroTarjeta = "41414141",
-				TarjetaTipo = new TarjetaTipo("Medio boleto estudiantil", 50)
+				TarjetaTipo = new MedioBoleto()
 			};
 			tarjeta.RecargarSaldo(5000);
 

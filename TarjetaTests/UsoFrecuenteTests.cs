@@ -23,7 +23,7 @@ namespace TarjetaSUBE.Tests
 		[TestCase(120, 1185)]
 		public void CalcularTarifa_TarjetaNormal_AplicaDescuentoSegunViajesDelMes(int viajesPrevios, int tarifaEsperada)
 		{
-			var tarjeta = new Tarjeta { TarjetaTipo = new TarjetaTipo("Normal", 100) };
+			var tarjeta = new Tarjeta { TarjetaTipo = new Normal() };
 			AgregarViajes(tarjeta, viajesPrevios, inicioDeOctubre);
 
 			int tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 10, 31, 20, 0, 0));
@@ -78,7 +78,7 @@ namespace TarjetaSUBE.Tests
 		[Test]
 		public void CalcularTarifa_MedioBoleto_NoAplicaUsoFrecuente()
 		{
-			var tarjeta = new Tarjeta { TarjetaTipo = new TarjetaTipo("Medio boleto estudiantil", 50) };
+			var tarjeta = new Tarjeta { TarjetaTipo = new MedioBoleto() };
 			AgregarViajes(tarjeta, 40, inicioDeOctubre);
 
 			int tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 10, 31, 10, 0, 0));
@@ -86,11 +86,11 @@ namespace TarjetaSUBE.Tests
 			Assert.That(tarifa, Is.EqualTo(790));
 		}
 
-		[TestCase("Boleto gratuito estudiantil")]
-		[TestCase("Franquicia completa")]
-		public void CalcularTarifa_FranquiciaGratuita_NoAplicaUsoFrecuente(string nombreTipo)
+		[TestCase(typeof(BoletoGratuito))]
+		[TestCase(typeof(FranquiciaCompleta))]
+		public void CalcularTarifa_FranquiciaGratuita_NoAplicaUsoFrecuente(Type tipoTarjeta)
 		{
-			var tarjeta = new Tarjeta { TarjetaTipo = new TarjetaTipo(nombreTipo, 0) };
+			var tarjeta = new Tarjeta { TarjetaTipo = (TarjetaTipo)Activator.CreateInstance(tipoTarjeta)! };
 			AgregarViajes(tarjeta, 85, inicioDeOctubre);
 
 			int tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 10, 31, 10, 0, 0));
@@ -102,9 +102,9 @@ namespace TarjetaSUBE.Tests
 		public void EsNormal_SegunTipoDeTarjeta()
 		{
 			Assert.That(new Tarjeta().EsNormal(), Is.True);
-			Assert.That(new Tarjeta { TarjetaTipo = new TarjetaTipo("Normal", 100) }.EsNormal(), Is.True);
-			Assert.That(new Tarjeta { TarjetaTipo = new TarjetaTipo("Medio boleto estudiantil", 50) }.EsNormal(), Is.False);
-			Assert.That(new Tarjeta { TarjetaTipo = new TarjetaTipo("Franquicia completa", 0) }.EsNormal(), Is.False);
+			Assert.That(new Tarjeta { TarjetaTipo = new Normal() }.EsNormal(), Is.True);
+			Assert.That(new Tarjeta { TarjetaTipo = new MedioBoleto() }.EsNormal(), Is.False);
+			Assert.That(new Tarjeta { TarjetaTipo = new FranquiciaCompleta() }.EsNormal(), Is.False);
 		}
 
 		[Test]
