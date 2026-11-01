@@ -23,5 +23,7 @@ public class TransporteDbContext(DbContextOptions<TransporteDbContext> options) 
             .HasOne(t => t.TarjetaTipo)
             .WithMany()
             .HasForeignKey(t => t.TarjetaTipoId);
+
+        modelBuilder.Entity<ColectivoInterurbano>();
     }
 }

@@ -9,6 +9,8 @@ namespace TarjetaSUBE {
         public int Id { get; set; }
         public string Linea { get; set; }
 
+        public virtual int Tarifa => TarifaBasica;
+
         public bool PagarCon(Tarjeta tarjeta)
         {
             return PagarCon(tarjeta, DateTime.Now);
@@ -21,7 +23,7 @@ namespace TarjetaSUBE {
                 return false;
             }
 
-            int tarifa = tarjeta.CalcularTarifa(TarifaBasica, fechaHora);
+            int tarifa = tarjeta.CalcularTarifa(Tarifa, fechaHora);
 
             if (tarjeta.PuedePagar(tarifa))
             {
@@ -29,7 +31,7 @@ namespace TarjetaSUBE {
 
                 Boleto nuevoBoleto = new Boleto
                 {
-                    TarifaBasica = TarifaBasica,
+                    TarifaBasica = Tarifa,
                     FechayHora = fechaHora,
                     TarjetaId = tarjeta.Id,
                     TipoTarjeta = tarjeta.TarjetaTipo?.Nombre ?? "Normal",
