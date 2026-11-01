@@ -34,13 +34,13 @@ namespace TarjetaSUBE {
                     TarifaBasica = Tarifa,
                     FechayHora = fechaHora,
                     TarjetaId = tarjeta.Id,
-                    TipoTarjeta = tarjeta.TarjetaTipo?.Nombre ?? "Normal",
+                    TipoTarjeta = tarjeta.NombreTipo,
                     LineaColectivo = Linea,
                     TotalAbonado = tarifa,
                     SaldoRestante = tarjeta.Saldo
                 };
 
-                tarjeta.Boletos.Add(nuevoBoleto);
+                tarjeta.RegistrarViaje(nuevoBoleto);
                 return true;
             }
 

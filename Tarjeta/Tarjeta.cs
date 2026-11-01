@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace TarjetaSUBE
 {
-    public class Tarjeta : ITarjeta
+    public class Tarjeta : IMedioDePago, ITarjetaRecargable
     {
         public const int SaldoNegativoPermitido = -2000;
         public const int SaldoMaximo = 56000;
@@ -18,6 +18,8 @@ namespace TarjetaSUBE
         public TarjetaTipo? TarjetaTipo { get; set; }
 
         public List<Boleto> Boletos { get; set; } = new List<Boleto>();
+
+        public string NombreTipo => ObtenerTipo().Nombre;
 
         public Tarjeta()
         {
@@ -68,7 +70,7 @@ namespace TarjetaSUBE
             return true;
         }
 
-        public void AcreditarCarga()
+        private void AcreditarCarga()
         {
             int acreditar = Math.Min(SaldoMaximo - Saldo, SaldoPendiente);
 
@@ -91,6 +93,11 @@ namespace TarjetaSUBE
 
             Saldo -= saldoAdescontar;
             AcreditarCarga();
+        }
+
+        public void RegistrarViaje(Boleto boleto)
+        {
+            Boletos.Add(boleto);
         }
 
         public bool EsNormal()
