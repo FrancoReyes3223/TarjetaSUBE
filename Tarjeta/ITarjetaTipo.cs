@@ -6,5 +6,8 @@ namespace TarjetaSUBE
         string Nombre { get; }
         int PorcentajeTarifa { get; }
         int CalcularTarifa(int tarifaBasica);
+        bool EsNormal();
+        bool EsMedioBoleto();
+        bool TieneLimiteDeViajesDiarios();
     }
 }

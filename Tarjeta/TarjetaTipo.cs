@@ -23,5 +23,31 @@ namespace TarjetaSUBE
         {
             return (tarifaBasica * PorcentajeTarifa) / 100;
         }
+
+        public bool EsNormal()
+        {
+            return PorcentajeTarifa == 100;
+        }
+
+        public bool EsMedioBoleto()
+        {
+            return PorcentajeTarifa == 50;
+        }
+
+        public bool TieneLimiteDeViajesDiarios()
+        {
+            switch (PorcentajeTarifa)
+            {
+                case 50:
+                    return true;
+
+                case 0:
+                    string nombre = Nombre.Trim().ToLower();
+                    return (nombre != "franquicia completa");
+
+                default:
+                    return false;
+            }
+        }
     }
 }
