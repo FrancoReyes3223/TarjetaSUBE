@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TarjetaSUBE 
-{ 
-    public class Tarjeta : ITarjeta
+namespace TarjetaSUBE
+{
+    public class Tarjeta : IMedioDePago, ITarjetaRecargable
     {
         public const int SaldoNegativoPermitido = -2000;
         public const int SaldoMaximo = 56000;
@@ -19,9 +19,11 @@ namespace TarjetaSUBE
 
         public List<Boleto> Boletos { get; set; } = new List<Boleto>();
 
+        public string NombreTipo => ObtenerTipo().Nombre;
+
         public Tarjeta()
         {
-            Saldo = 0; 
+            Saldo = 0;
         }
 
         public Tarjeta(TarjetaTipo tipo) : this()
@@ -30,61 +32,29 @@ namespace TarjetaSUBE
             TarjetaTipoId = tipo.Id;
         }
 
-        public int CalcularTarifa(int tarifaBasica, DateTime fechaHora)
+        private TarjetaTipo ObtenerTipo()
         {
-            if (EsNormal())
-            {
-                return CalcularTarifaUsoFrecuente(tarifaBasica, fechaHora);
-            }
-
-            if (TieneLimiteDeViajesDiarios())
-            {
-                int viajesHoy = 0;
-                foreach (var boleto in Boletos)
-                {
-                    if (boleto.FechayHora.Date == fechaHora.Date)
-                    {
-                        viajesHoy++;
-
-                        if (viajesHoy >= 2)
-                        {
-                            return tarifaBasica;
-                        }
-                    }
-                }
-            }
-            return CalcularTarifa(tarifaBasica);
+            return TarjetaTipo ?? new Normal();
         }
 
-        public int CalcularTarifaUsoFrecuente(int tarifaBasica, DateTime fechaHora)
+        private HistorialViajes ObtenerHistorial()
         {
-            int numeroDeViaje = ViajesDelMes(fechaHora) + 1;
+            return new HistorialViajes(Boletos);
+        }
 
-            if (numeroDeViaje >= 80)
-            {
-                return tarifaBasica * 75 / 100;
-            }
-
-            if (numeroDeViaje >= 30)
-            {
-                return tarifaBasica * 80 / 100;
-            }
-
-            return tarifaBasica;
+        public int CalcularTarifa(int tarifaBasica, DateTime fechaHora)
+        {
+            return ObtenerTipo().CalcularTarifa(tarifaBasica, ObtenerHistorial(), fechaHora);
         }
 
         public int ViajesDelMes(DateTime fechaHora)
         {
-            return Boletos.Count(b => b.FechayHora.Year == fechaHora.Year && b.FechayHora.Month == fechaHora.Month);
+            return ObtenerHistorial().ViajesDelMes(fechaHora);
         }
 
         public int CalcularTarifa(int tarifaBasica)
         {
-            if (TarjetaTipo != null)
-            {
-                return TarjetaTipo.CalcularTarifa(tarifaBasica);
-            }
-            return tarifaBasica;
+            return ObtenerTipo().CalcularTarifa(tarifaBasica);
         }
 
         public bool RecargarSaldo(int recarga)
@@ -100,7 +70,7 @@ namespace TarjetaSUBE
             return true;
         }
 
-        public void AcreditarCarga()
+        private void AcreditarCarga()
         {
             int acreditar = Math.Min(SaldoMaximo - Saldo, SaldoPendiente);
 
@@ -125,53 +95,19 @@ namespace TarjetaSUBE
             AcreditarCarga();
         }
 
+        public void RegistrarViaje(Boleto boleto)
+        {
+            Boletos.Add(boleto);
+        }
+
         public bool EsNormal()
         {
-            return TarjetaTipo == null || TarjetaTipo.PorcentajeTarifa == 100;
+            return ObtenerTipo() is Normal;
         }
 
-        public bool EsMedioBoleto()
+        public bool PuedeViajar(DateTime fechaHora)
         {
-            if (TarjetaTipo != null && TarjetaTipo.PorcentajeTarifa == 50)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        public bool TieneLimiteDeViajesDiarios()
-        {
-            if (TarjetaTipo == null)
-            {
-                return false;
-            }
-
-            switch (TarjetaTipo.PorcentajeTarifa)
-            {
-                case 50:
-                    return true;
-
-                case 0:
-                    string nombre = TarjetaTipo.Nombre.Trim().ToLower();
-                    return (nombre != "franquicia completa");
-
-                default:
-                    return false;
-            }
-        }
-
-        public bool PasaronCincoMinutos(DateTime fechaHora)
-        {
-            if (!EsMedioBoleto() || Boletos.Count == 0)
-            {
-                return true;
-            }
-
-            Boleto ultimoBoleto = Boletos[Boletos.Count - 1];
-            TimeSpan tiempoPasado = fechaHora - ultimoBoleto.FechayHora;
-
-            return tiempoPasado.TotalMinutes > 5;
+            return ObtenerTipo().PuedeViajar(ObtenerHistorial(), fechaHora);
         }
     }
 }

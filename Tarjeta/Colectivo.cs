@@ -1,6 +1,6 @@
 using System;
 
-namespace TarjetaSUBE { 
+namespace TarjetaSUBE {
 
     public class Colectivo : IColectivo
     {
@@ -11,36 +11,36 @@ namespace TarjetaSUBE {
 
         public virtual int Tarifa => TarifaBasica;
 
-        public bool PagarCon(Tarjeta tarjeta)
+        public bool PagarCon(IMedioDePago medioDePago)
         {
-            return PagarCon(tarjeta, DateTime.Now);
+            return PagarCon(medioDePago, DateTime.Now);
         }
 
-        public bool PagarCon(Tarjeta tarjeta, DateTime fechaHora)
+        public bool PagarCon(IMedioDePago medioDePago, DateTime fechaHora)
         {
-            if (!tarjeta.PasaronCincoMinutos(fechaHora))
+            if (!medioDePago.PuedeViajar(fechaHora))
             {
                 return false;
             }
 
-            int tarifa = tarjeta.CalcularTarifa(Tarifa, fechaHora);
+            int tarifa = medioDePago.CalcularTarifa(Tarifa, fechaHora);
 
-            if (tarjeta.PuedePagar(tarifa))
+            if (medioDePago.PuedePagar(tarifa))
             {
-                tarjeta.DescontarSaldo(tarifa);
+                medioDePago.DescontarSaldo(tarifa);
 
                 Boleto nuevoBoleto = new Boleto
                 {
                     TarifaBasica = Tarifa,
                     FechayHora = fechaHora,
-                    TarjetaId = tarjeta.Id,
-                    TipoTarjeta = tarjeta.TarjetaTipo?.Nombre ?? "Normal",
+                    TarjetaId = medioDePago.Id,
+                    TipoTarjeta = medioDePago.NombreTipo,
                     LineaColectivo = Linea,
                     TotalAbonado = tarifa,
-                    SaldoRestante = tarjeta.Saldo
+                    SaldoRestante = medioDePago.Saldo
                 };
 
-                tarjeta.Boletos.Add(nuevoBoleto);
+                medioDePago.RegistrarViaje(nuevoBoleto);
                 return true;
             }
 

@@ -30,7 +30,7 @@ namespace TarjetaSUBE.Tests
 			var tarjeta = new Tarjeta
 			{
 				Id = 50,
-				TarjetaTipo = new TarjetaTipo("Normal", 100)
+				TarjetaTipo = new Normal()
 			};
 			tarjeta.RecargarSaldo(5000);
 
@@ -69,7 +69,7 @@ namespace TarjetaSUBE.Tests
 			var tarjeta = new Tarjeta
 			{
 				Id = 52,
-				TarjetaTipo = new TarjetaTipo("Medio boleto estudiantil", 50)
+				TarjetaTipo = new MedioBoleto()
 			};
 			tarjeta.RecargarSaldo(2000);
 
@@ -81,14 +81,14 @@ namespace TarjetaSUBE.Tests
 			Assert.That(tarjeta.Saldo, Is.EqualTo(2000 - 1500));
 		}
 
-		[TestCase("Boleto gratuito estudiantil")]
-		[TestCase("Franquicia completa")]
-		public void PagarCon_FranquiciaGratuita_NoAbonaNada(string nombreTipo)
+		[TestCase(typeof(BoletoGratuito), "Boleto gratuito estudiantil")]
+		[TestCase(typeof(FranquiciaCompleta), "Franquicia completa")]
+		public void PagarCon_FranquiciaGratuita_NoAbonaNada(Type tipoTarjeta, string nombreTipo)
 		{
 			var tarjeta = new Tarjeta
 			{
 				Id = 53,
-				TarjetaTipo = new TarjetaTipo(nombreTipo, 0)
+				TarjetaTipo = (TarjetaTipo)Activator.CreateInstance(tipoTarjeta)!
 			};
 
 			bool pago = new ColectivoInterurbano { Linea = "Galvez" }.PagarCon(tarjeta, martesALas10);
@@ -128,7 +128,7 @@ namespace TarjetaSUBE.Tests
 		[Test]
 		public void PagarCon_MedioBoleto_NoPermiteViajarAntesDePasarCincoMinutos()
 		{
-			var tarjeta = new Tarjeta { TarjetaTipo = new TarjetaTipo("Medio boleto estudiantil", 50) };
+			var tarjeta = new Tarjeta { TarjetaTipo = new MedioBoleto() };
 			tarjeta.RecargarSaldo(10000);
 
 			var colectivo = new ColectivoInterurbano();
@@ -142,7 +142,7 @@ namespace TarjetaSUBE.Tests
 		[Test]
 		public void PagarCon_MedioBoleto_TercerViajeDelDiaAbonaTarifaInterurbanaCompleta()
 		{
-			var tarjeta = new Tarjeta { TarjetaTipo = new TarjetaTipo("Medio boleto estudiantil", 50) };
+			var tarjeta = new Tarjeta { TarjetaTipo = new MedioBoleto() };
 			tarjeta.RecargarSaldo(10000);
 
 			var colectivo = new ColectivoInterurbano();
@@ -160,7 +160,7 @@ namespace TarjetaSUBE.Tests
 		[Test]
 		public void PagarCon_BoletoGratuito_TercerViajeDelDiaAbonaTarifaInterurbanaCompleta()
 		{
-			var tarjeta = new Tarjeta { TarjetaTipo = new TarjetaTipo("Boleto gratuito estudiantil", 0) };
+			var tarjeta = new Tarjeta { TarjetaTipo = new BoletoGratuito() };
 			tarjeta.RecargarSaldo(5000);
 
 			var colectivo = new ColectivoInterurbano();
