@@ -6,12 +6,12 @@ namespace TarjetaSUBE
     {
         int Id { get; }
         string NombreTipo { get; }
-        int Saldo { get; }
+        decimal Saldo { get; }
 
         bool PuedeViajar(DateTime fechaHora);
-        int CalcularTarifa(int tarifaBasica, DateTime fechaHora);
-        bool PuedePagar(int monto);
-        void DescontarSaldo(int monto);
+        decimal CalcularTarifa(decimal tarifaBasica, DateTime fechaHora);
+        bool PuedePagar(decimal monto);
+        void DescontarSaldo(decimal monto);
         void RegistrarViaje(Boleto boleto);
     }
 }
