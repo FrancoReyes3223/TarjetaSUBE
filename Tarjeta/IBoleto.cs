@@ -12,5 +12,6 @@ namespace TarjetaSUBE
         string LineaColectivo { get; }
         decimal TotalAbonado { get; }
         decimal SaldoRestante { get; }
+        bool EsTrasbordo { get; }
     }
 }

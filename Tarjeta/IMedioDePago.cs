@@ -9,6 +9,7 @@ namespace TarjetaSUBE
         decimal Saldo { get; }
 
         bool PuedeViajar(DateTime fechaHora);
+        bool EsTrasbordo(string linea, DateTime fechaHora);
         decimal CalcularTarifa(decimal tarifaBasica, DateTime fechaHora);
         bool PuedePagar(decimal monto);
         void DescontarSaldo(decimal monto);

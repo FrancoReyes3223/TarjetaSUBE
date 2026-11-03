@@ -12,5 +12,6 @@ namespace TarjetaSUBE
         public string LineaColectivo { get; set; } = string.Empty;
         public decimal TotalAbonado { get; set; }
         public decimal SaldoRestante { get; set; }
+        public bool EsTrasbordo { get; set; }
     }
 }
