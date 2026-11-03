@@ -21,12 +21,12 @@ namespace TarjetaSUBE.Tests
 		[TestCase(78, 1264)]
 		[TestCase(79, 1185)]
 		[TestCase(120, 1185)]
-		public void CalcularTarifa_TarjetaNormal_AplicaDescuentoSegunViajesDelMes(int viajesPrevios, int tarifaEsperada)
+		public void CalcularTarifa_TarjetaNormal_AplicaDescuentoSegunViajesDelMes(int viajesPrevios, decimal tarifaEsperada)
 		{
 			var tarjeta = new Tarjeta { TarjetaTipo = new Normal() };
 			AgregarViajes(tarjeta, viajesPrevios, inicioDeOctubre);
 
-			int tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 10, 31, 20, 0, 0));
+			decimal tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 10, 31, 20, 0, 0));
 
 			Assert.That(tarifa, Is.EqualTo(tarifaEsperada));
 		}
@@ -37,7 +37,7 @@ namespace TarjetaSUBE.Tests
 			var tarjeta = new Tarjeta();
 			AgregarViajes(tarjeta, 29, inicioDeOctubre);
 
-			int tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 10, 31, 20, 0, 0));
+			decimal tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 10, 31, 20, 0, 0));
 
 			Assert.That(tarifa, Is.EqualTo(1264));
 		}
@@ -48,7 +48,7 @@ namespace TarjetaSUBE.Tests
 			var tarjeta = new Tarjeta();
 			AgregarViajes(tarjeta, 85, new DateTime(2026, 9, 1, 8, 0, 0));
 
-			int tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 10, 1, 8, 0, 0));
+			decimal tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 10, 1, 8, 0, 0));
 
 			Assert.That(tarjeta.ViajesDelMes(new DateTime(2026, 10, 1)), Is.EqualTo(0));
 			Assert.That(tarifa, Is.EqualTo(1580));
@@ -60,7 +60,7 @@ namespace TarjetaSUBE.Tests
 			var tarjeta = new Tarjeta();
 			AgregarViajes(tarjeta, 85, new DateTime(2025, 10, 1, 8, 0, 0));
 
-			int tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, inicioDeOctubre);
+			decimal tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, inicioDeOctubre);
 
 			Assert.That(tarifa, Is.EqualTo(1580));
 		}
@@ -81,7 +81,7 @@ namespace TarjetaSUBE.Tests
 			var tarjeta = new Tarjeta { TarjetaTipo = new MedioBoleto() };
 			AgregarViajes(tarjeta, 40, inicioDeOctubre);
 
-			int tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 10, 31, 10, 0, 0));
+			decimal tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 10, 31, 10, 0, 0));
 
 			Assert.That(tarifa, Is.EqualTo(790));
 		}
@@ -93,7 +93,7 @@ namespace TarjetaSUBE.Tests
 			var tarjeta = new Tarjeta { TarjetaTipo = (TarjetaTipo)Activator.CreateInstance(tipoTarjeta)! };
 			AgregarViajes(tarjeta, 85, inicioDeOctubre);
 
-			int tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 10, 31, 10, 0, 0));
+			decimal tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 10, 31, 10, 0, 0));
 
 			Assert.That(tarifa, Is.EqualTo(0));
 		}

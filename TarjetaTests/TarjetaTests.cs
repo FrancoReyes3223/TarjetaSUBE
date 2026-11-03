@@ -27,7 +27,7 @@ namespace TarjetaSUBE.Tests
 
 		[TestCase(30000)]
 
-		public void RecargarSaldo_MontosValidos_SumaElSaldoYDevuelveTrue(int montoRecarga)
+		public void RecargarSaldo_MontosValidos_SumaElSaldoYDevuelveTrue(decimal montoRecarga)
 		{
 		
 			var tarjeta = new Tarjeta();
@@ -250,7 +250,7 @@ namespace TarjetaSUBE.Tests
 			var tipoUniversitario = new MedioBoleto { Nombre = "Medio boleto universitario" };
 			var tarjeta = new Tarjeta { TarjetaTipo = tipoUniversitario };
 
-			int tarifa = tarjeta.CalcularTarifa(1580);
+			decimal tarifa = tarjeta.CalcularTarifa(1580);
 
 			Assert.That(tarifa, Is.EqualTo(790));
 		}
