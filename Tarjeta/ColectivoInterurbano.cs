@@ -2,8 +2,8 @@ namespace TarjetaSUBE
 {
     public class ColectivoInterurbano : Colectivo
     {
-        public const int TarifaInterurbana = 3000;
+        public const decimal TarifaInterurbana = 3000m;
 
-        public override int Tarifa => TarifaInterurbana;
+        public override decimal Tarifa => TarifaInterurbana;
     }
 }
