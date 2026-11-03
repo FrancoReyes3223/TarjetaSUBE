@@ -4,12 +4,12 @@ namespace TarjetaSUBE {
 
     public class Colectivo : IColectivo
     {
-        public const int TarifaBasica = 1580;
+        public const decimal TarifaBasica = 1580m;
 
         public int Id { get; set; }
         public string Linea { get; set; }
 
-        public virtual int Tarifa => TarifaBasica;
+        public virtual decimal Tarifa => TarifaBasica;
 
         public bool PagarCon(IMedioDePago medioDePago)
         {
@@ -23,7 +23,7 @@ namespace TarjetaSUBE {
                 return false;
             }
 
-            int tarifa = medioDePago.CalcularTarifa(Tarifa, fechaHora);
+            decimal tarifa = medioDePago.CalcularTarifa(Tarifa, fechaHora);
 
             if (medioDePago.PuedePagar(tarifa))
             {

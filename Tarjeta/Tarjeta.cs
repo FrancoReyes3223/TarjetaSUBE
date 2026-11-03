@@ -6,13 +6,13 @@ namespace TarjetaSUBE
 {
     public class Tarjeta : IMedioDePago, ITarjetaRecargable
     {
-        public const int SaldoNegativoPermitido = -2000;
-        public const int SaldoMaximo = 56000;
+        public const decimal SaldoNegativoPermitido = -2000m;
+        public const decimal SaldoMaximo = 56000m;
 
         public int Id { get; set; }
         public string NumeroTarjeta { get; set; }
-        public int Saldo { get; private set; }
-        public int SaldoPendiente { get; private set; }
+        public decimal Saldo { get; private set; }
+        public decimal SaldoPendiente { get; private set; }
 
         public int TarjetaTipoId { get; set; }
         public TarjetaTipo? TarjetaTipo { get; set; }
@@ -23,7 +23,7 @@ namespace TarjetaSUBE
 
         public Tarjeta()
         {
-            Saldo = 0;
+            Saldo = 0m;
         }
 
         public Tarjeta(TarjetaTipo tipo) : this()
@@ -42,7 +42,7 @@ namespace TarjetaSUBE
             return new HistorialViajes(Boletos);
         }
 
-        public int CalcularTarifa(int tarifaBasica, DateTime fechaHora)
+        public decimal CalcularTarifa(decimal tarifaBasica, DateTime fechaHora)
         {
             return ObtenerTipo().CalcularTarifa(tarifaBasica, ObtenerHistorial(), fechaHora);
         }
@@ -52,14 +52,14 @@ namespace TarjetaSUBE
             return ObtenerHistorial().ViajesDelMes(fechaHora);
         }
 
-        public int CalcularTarifa(int tarifaBasica)
+        public decimal CalcularTarifa(decimal tarifaBasica)
         {
             return ObtenerTipo().CalcularTarifa(tarifaBasica);
         }
 
-        public bool RecargarSaldo(int recarga)
+        public bool RecargarSaldo(decimal recarga)
         {
-            int[] montosPermitidos = { 2000, 3000, 4000, 5000, 8000, 10000, 15000, 20000, 25000, 30000 };
+            decimal[] montosPermitidos = { 2000m, 3000m, 4000m, 5000m, 8000m, 10000m, 15000m, 20000m, 25000m, 30000m };
 
             if (!montosPermitidos.Contains(recarga))
             {
@@ -72,21 +72,21 @@ namespace TarjetaSUBE
 
         private void AcreditarCarga()
         {
-            int acreditar = Math.Min(SaldoMaximo - Saldo, SaldoPendiente);
+            decimal acreditar = Math.Min(SaldoMaximo - Saldo, SaldoPendiente);
 
-            if (acreditar > 0)
+            if (acreditar > 0m)
             {
                 Saldo += acreditar;
                 SaldoPendiente -= acreditar;
             }
         }
 
-        public bool PuedePagar(int monto)
+        public bool PuedePagar(decimal monto)
         {
             return Saldo - monto >= SaldoNegativoPermitido;
         }
 
-        public void DescontarSaldo(int saldoAdescontar)
+        public void DescontarSaldo(decimal saldoAdescontar)
         {
             if (!PuedePagar(saldoAdescontar))
                 return;

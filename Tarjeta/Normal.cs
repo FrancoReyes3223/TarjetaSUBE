@@ -6,18 +6,18 @@ namespace TarjetaSUBE
     {
         public override int PorcentajeTarifa => 100;
 
-        public override int CalcularTarifa(int tarifaBasica, HistorialViajes historial, DateTime fechaHora)
+        public override decimal CalcularTarifa(decimal tarifaBasica, HistorialViajes historial, DateTime fechaHora)
         {
             int numeroDeViaje = historial.ViajesDelMes(fechaHora) + 1;
 
             if (numeroDeViaje >= 80)
             {
-                return tarifaBasica * 75 / 100;
+                return tarifaBasica * 0.75m;
             }
 
             if (numeroDeViaje >= 30)
             {
-                return tarifaBasica * 80 / 100;
+                return tarifaBasica * 0.80m;
             }
 
             return tarifaBasica;

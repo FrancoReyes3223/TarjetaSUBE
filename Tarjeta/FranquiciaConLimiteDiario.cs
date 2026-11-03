@@ -6,7 +6,7 @@ namespace TarjetaSUBE
     {
         public const int ViajesDiariosConFranquicia = 2;
 
-        public override int CalcularTarifa(int tarifaBasica, HistorialViajes historial, DateTime fechaHora)
+        public override decimal CalcularTarifa(decimal tarifaBasica, HistorialViajes historial, DateTime fechaHora)
         {
             if (historial.ViajesDelDia(fechaHora) >= ViajesDiariosConFranquicia)
             {

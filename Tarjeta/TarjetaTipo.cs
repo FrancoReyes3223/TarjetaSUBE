@@ -9,12 +9,12 @@ namespace TarjetaSUBE
 
         public abstract int PorcentajeTarifa { get; }
 
-        public int CalcularTarifa(int tarifaBasica)
+        public decimal CalcularTarifa(decimal tarifaBasica)
         {
-            return (tarifaBasica * PorcentajeTarifa) / 100;
+            return (tarifaBasica * PorcentajeTarifa) / 100m;
         }
 
-        public virtual int CalcularTarifa(int tarifaBasica, HistorialViajes historial, DateTime fechaHora)
+        public virtual decimal CalcularTarifa(decimal tarifaBasica, HistorialViajes historial, DateTime fechaHora)
         {
             return CalcularTarifa(tarifaBasica);
         }
