@@ -4,7 +4,7 @@ namespace TarjetaSUBE {
 
     public class Colectivo : IColectivo
     {
-        public const decimal TarifaBasica = 1580m;
+        public const decimal TarifaBasica = 2150m;
 
         public int Id { get; set; }
         public string Linea { get; set; }

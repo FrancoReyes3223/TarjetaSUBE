@@ -12,7 +12,7 @@ namespace TarjetaSUBE.Tests
 		public void PagarCon_BoletoGratuito_PermiteHastaDosViajesGratisPorDiaYTercerViajeCobraPrecioCompleto()
 		{
 			// Resultado esperado: El boleto gratuito estudiantil permite hasta 2 viajes sin cargo ($0) por dia,
-			// y a partir del 3er viaje del mismo dia cobra la tarifa completa ($1580).
+			// y a partir del 3er viaje del mismo dia cobra la tarifa completa ($2150).
 			var tarjeta = new Tarjeta
 			{
 				Id = 50,
@@ -30,8 +30,8 @@ namespace TarjetaSUBE.Tests
 			Assert.That(tarjeta.Boletos[1].TotalAbonado, Is.EqualTo(0m));
 
 			Assert.That(colectivo.PagarCon(tarjeta, lunesALas10.AddMinutes(20)), Is.True);
-			Assert.That(tarjeta.Boletos[2].TotalAbonado, Is.EqualTo(1580m));
-			Assert.That(tarjeta.Saldo, Is.EqualTo(3000m - 1580m));
+			Assert.That(tarjeta.Boletos[2].TotalAbonado, Is.EqualTo(2150m));
+			Assert.That(tarjeta.Saldo, Is.EqualTo(3000m - 2150m));
 		}
 
 		[TestCase(typeof(MedioBoleto))]

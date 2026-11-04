@@ -40,7 +40,7 @@ namespace TarjetaSUBE.Tests
 			var boletosDeLaTarjeta = Db.Boletos.Where(b => b.TarjetaId == tarjeta.Id).ToList();
 
 			Assert.That(boletosDeLaTarjeta, Has.Count.EqualTo(1));
-			Assert.That(boletosDeLaTarjeta[0].TarifaBasica, Is.EqualTo(1580));
+			Assert.That(boletosDeLaTarjeta[0].TarifaBasica, Is.EqualTo(2150));
 		}
 
 		[Test]
