@@ -15,12 +15,12 @@ namespace TarjetaSUBE.Tests
 			}
 		}
 
-		[TestCase(0, 1580)]
-		[TestCase(28, 1580)]
-		[TestCase(29, 1264)]
-		[TestCase(78, 1264)]
-		[TestCase(79, 1185)]
-		[TestCase(120, 1185)]
+		[TestCase(0, 2150)]
+		[TestCase(28, 2150)]
+		[TestCase(29, 1720)]
+		[TestCase(78, 1720)]
+		[TestCase(79, 1612.5)]
+		[TestCase(120, 1612.5)]
 		public void CalcularTarifa_TarjetaNormal_AplicaDescuentoSegunViajesDelMes(int viajesPrevios, decimal tarifaEsperada)
 		{
 			var tarjeta = new Tarjeta { TarjetaTipo = new Normal() };
@@ -39,7 +39,7 @@ namespace TarjetaSUBE.Tests
 
 			decimal tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 10, 31, 20, 0, 0));
 
-			Assert.That(tarifa, Is.EqualTo(1264));
+			Assert.That(tarifa, Is.EqualTo(1720));
 		}
 
 		[Test]
@@ -51,7 +51,7 @@ namespace TarjetaSUBE.Tests
 			decimal tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 10, 1, 8, 0, 0));
 
 			Assert.That(tarjeta.ViajesDelMes(new DateTime(2026, 10, 1)), Is.EqualTo(0));
-			Assert.That(tarifa, Is.EqualTo(1580));
+			Assert.That(tarifa, Is.EqualTo(2150));
 		}
 
 		[Test]
@@ -62,7 +62,7 @@ namespace TarjetaSUBE.Tests
 
 			decimal tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, inicioDeOctubre);
 
-			Assert.That(tarifa, Is.EqualTo(1580));
+			Assert.That(tarifa, Is.EqualTo(2150));
 		}
 
 		[Test]
@@ -71,8 +71,8 @@ namespace TarjetaSUBE.Tests
 			var tarjeta = new Tarjeta();
 			AgregarViajes(tarjeta, 85, new DateTime(2026, 10, 1, 8, 0, 0));
 
-			Assert.That(tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 10, 31, 23, 59, 0)), Is.EqualTo(1185));
-			Assert.That(tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 11, 1, 0, 0, 0)), Is.EqualTo(1580));
+			Assert.That(tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 10, 31, 23, 59, 0)), Is.EqualTo(1612.5m));
+			Assert.That(tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 11, 1, 0, 0, 0)), Is.EqualTo(2150));
 		}
 
 		[Test]
@@ -83,7 +83,7 @@ namespace TarjetaSUBE.Tests
 
 			decimal tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 10, 31, 10, 0, 0));
 
-			Assert.That(tarifa, Is.EqualTo(790));
+			Assert.That(tarifa, Is.EqualTo(1075));
 		}
 
 		[TestCase(typeof(BoletoGratuito))]
@@ -118,9 +118,9 @@ namespace TarjetaSUBE.Tests
 
 			Assert.That(pago, Is.True);
 			Boleto boleto = tarjeta.Boletos[29];
-			Assert.That(boleto.TarifaBasica, Is.EqualTo(1580));
-			Assert.That(boleto.TotalAbonado, Is.EqualTo(1264));
-			Assert.That(tarjeta.Saldo, Is.EqualTo(5000 - 1264));
+			Assert.That(boleto.TarifaBasica, Is.EqualTo(2150));
+			Assert.That(boleto.TotalAbonado, Is.EqualTo(1720));
+			Assert.That(tarjeta.Saldo, Is.EqualTo(5000 - 1720));
 		}
 
 		[Test]
@@ -136,9 +136,9 @@ namespace TarjetaSUBE.Tests
 			colectivo.PagarCon(tarjeta, noche);
 			colectivo.PagarCon(tarjeta, noche.AddMinutes(30));
 
-			Assert.That(tarjeta.Boletos[28].TotalAbonado, Is.EqualTo(1580));
-			Assert.That(tarjeta.Boletos[29].TotalAbonado, Is.EqualTo(1264));
-			Assert.That(tarjeta.Saldo, Is.EqualTo(10000 - 1580 - 1264));
+			Assert.That(tarjeta.Boletos[28].TotalAbonado, Is.EqualTo(2150));
+			Assert.That(tarjeta.Boletos[29].TotalAbonado, Is.EqualTo(1720));
+			Assert.That(tarjeta.Saldo, Is.EqualTo(10000 - 2150 - 1720));
 		}
 	}
 }

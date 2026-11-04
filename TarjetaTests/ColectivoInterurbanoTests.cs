@@ -13,7 +13,7 @@ namespace TarjetaSUBE.Tests
 		{
 			var colectivo = new Colectivo();
 
-			Assert.That(colectivo.Tarifa, Is.EqualTo(1580));
+			Assert.That(colectivo.Tarifa, Is.EqualTo(2150));
 		}
 
 		[Test]
@@ -182,9 +182,9 @@ namespace TarjetaSUBE.Tests
 			new Colectivo { Linea = "K" }.PagarCon(tarjeta, martesALas10);
 			new ColectivoInterurbano { Linea = "Galvez" }.PagarCon(tarjeta, martesALas10.AddHours(2));
 
-			Assert.That(tarjeta.Boletos[0].TotalAbonado, Is.EqualTo(1580));
+			Assert.That(tarjeta.Boletos[0].TotalAbonado, Is.EqualTo(2150));
 			Assert.That(tarjeta.Boletos[1].TotalAbonado, Is.EqualTo(3000));
-			Assert.That(tarjeta.Saldo, Is.EqualTo(10000 - 1580 - 3000));
+			Assert.That(tarjeta.Saldo, Is.EqualTo(10000 - 2150 - 3000));
 		}
 
 		[Test]
