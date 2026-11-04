@@ -180,7 +180,7 @@ namespace TarjetaSUBE.Tests
 			tarjeta.RecargarSaldo(10000);
 
 			new Colectivo { Linea = "K" }.PagarCon(tarjeta, martesALas10);
-			new ColectivoInterurbano { Linea = "Galvez" }.PagarCon(tarjeta, martesALas10.AddMinutes(30));
+			new ColectivoInterurbano { Linea = "Galvez" }.PagarCon(tarjeta, martesALas10.AddHours(2));
 
 			Assert.That(tarjeta.Boletos[0].TotalAbonado, Is.EqualTo(1580));
 			Assert.That(tarjeta.Boletos[1].TotalAbonado, Is.EqualTo(3000));

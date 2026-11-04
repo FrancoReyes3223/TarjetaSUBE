@@ -109,5 +109,10 @@ namespace TarjetaSUBE
         {
             return ObtenerTipo().PuedeViajar(ObtenerHistorial(), fechaHora);
         }
+
+        public bool EsTrasbordo(string linea, DateTime fechaHora)
+        {
+            return ObtenerHistorial().EsTrasbordo(linea, fechaHora);
+        }
     }
 }

@@ -23,7 +23,8 @@ namespace TarjetaSUBE {
                 return false;
             }
 
-            decimal tarifa = medioDePago.CalcularTarifa(Tarifa, fechaHora);
+            bool esTrasbordo = medioDePago.EsTrasbordo(Linea, fechaHora);
+            decimal tarifa = esTrasbordo ? 0m : medioDePago.CalcularTarifa(Tarifa, fechaHora);
 
             if (medioDePago.PuedePagar(tarifa))
             {
@@ -37,7 +38,8 @@ namespace TarjetaSUBE {
                     TipoTarjeta = medioDePago.NombreTipo,
                     LineaColectivo = Linea,
                     TotalAbonado = tarifa,
-                    SaldoRestante = medioDePago.Saldo
+                    SaldoRestante = medioDePago.Saldo,
+                    EsTrasbordo = esTrasbordo
                 };
 
                 medioDePago.RegistrarViaje(nuevoBoleto);
