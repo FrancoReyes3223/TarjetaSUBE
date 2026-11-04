@@ -6,7 +6,6 @@ namespace TarjetaSUBE.Tests
 {
 	public class TarjetaTests
 	{
-	
 		[TestCase(2000)]
 
 		[TestCase(3000)]
@@ -267,7 +266,7 @@ namespace TarjetaSUBE.Tests
 			tarjeta.RecargarSaldo(3000);
 
 			var colectivo = new Colectivo();
-			DateTime fechaInicial = new DateTime(2026, 10, 24, 10, 0, 0);
+			DateTime fechaInicial = new DateTime(2026, 10, 22, 10, 0, 0);
 
 			bool primerViaje = colectivo.PagarCon(tarjeta, fechaInicial);
 			Assert.That(primerViaje, Is.True);
@@ -293,7 +292,7 @@ namespace TarjetaSUBE.Tests
 			tarjeta.RecargarSaldo(5000);
 
 			var colectivo = new Colectivo();
-			DateTime fechaHoy = new DateTime(2026, 10, 24, 8, 0, 0);
+			DateTime fechaHoy = new DateTime(2026, 10, 22, 8, 0, 0);
 
 			Assert.That(colectivo.PagarCon(tarjeta, fechaHoy), Is.True);
 			Assert.That(tarjeta.Boletos[0].TotalAbonado, Is.EqualTo(790));
