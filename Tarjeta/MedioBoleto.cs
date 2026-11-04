@@ -10,7 +10,7 @@ namespace TarjetaSUBE
 
         public override bool PuedeViajar(HistorialViajes historial, DateTime fechaHora)
         {
-            return historial.PasaronMinutosDesdeUltimoViaje(fechaHora, MinutosEntreViajes);
+            return base.PuedeViajar(historial, fechaHora) && historial.PasaronMinutosDesdeUltimoViaje(fechaHora, MinutosEntreViajes);
         }
     }
 }

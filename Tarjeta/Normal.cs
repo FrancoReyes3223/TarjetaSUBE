@@ -22,5 +22,10 @@ namespace TarjetaSUBE
 
             return tarifaBasica;
         }
+
+        public override bool PuedeViajar(HistorialViajes historial, DateTime fechaHora)
+        {
+            return true;
+        }
     }
 }

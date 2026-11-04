@@ -21,7 +21,12 @@ namespace TarjetaSUBE
 
         public virtual bool PuedeViajar(HistorialViajes historial, DateTime fechaHora)
         {
-            return true;
+            if (fechaHora.DayOfWeek == DayOfWeek.Saturday || fechaHora.DayOfWeek == DayOfWeek.Sunday)
+            {
+                return false;
+            }
+
+            return fechaHora.Hour >= 6 && fechaHora.Hour < 22;
         }
     }
 }
