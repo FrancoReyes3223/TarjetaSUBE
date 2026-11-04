@@ -2,26 +2,28 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TarjetaSUBE 
-{ 
-    public class Tarjeta : ITarjeta
+namespace TarjetaSUBE
+{
+    public class Tarjeta : IMedioDePago, ITarjetaRecargable
     {
-        public const int SaldoNegativoPermitido = -2000;
-        public const int SaldoMaximo = 56000;
+        public const decimal SaldoNegativoPermitido = -2000m;
+        public const decimal SaldoMaximo = 56000m;
 
         public int Id { get; set; }
         public string NumeroTarjeta { get; set; }
-        public int Saldo { get; private set; }
-        public int SaldoPendiente { get; private set; }
+        public decimal Saldo { get; private set; }
+        public decimal SaldoPendiente { get; private set; }
 
         public int TarjetaTipoId { get; set; }
         public TarjetaTipo? TarjetaTipo { get; set; }
 
         public List<Boleto> Boletos { get; set; } = new List<Boleto>();
 
+        public string NombreTipo => ObtenerTipo().Nombre;
+
         public Tarjeta()
         {
-            Saldo = 0; 
+            Saldo = 0m;
         }
 
         public Tarjeta(TarjetaTipo tipo) : this()
@@ -30,39 +32,34 @@ namespace TarjetaSUBE
             TarjetaTipoId = tipo.Id;
         }
 
-        public int CalcularTarifa(int tarifaBasica, DateTime fechaHora)
+        private TarjetaTipo ObtenerTipo()
         {
-            if (TieneLimiteDeViajesDiarios())
-            {
-                int viajesHoy = 0;
-                foreach (var boleto in Boletos)
-                {
-                    if (boleto.FechayHora.Date == fechaHora.Date)
-                    {
-                        viajesHoy++;
-
-                        if (viajesHoy >= 2)
-                        {
-                            return tarifaBasica;
-                        }
-                    }
-                }
-            }
-            return CalcularTarifa(tarifaBasica);
+            return TarjetaTipo ?? new Normal();
         }
 
-        public int CalcularTarifa(int tarifaBasica)
+        private HistorialViajes ObtenerHistorial()
         {
-            if (TarjetaTipo != null)
-            {
-                return TarjetaTipo.CalcularTarifa(tarifaBasica);
-            }
-            return tarifaBasica;
+            return new HistorialViajes(Boletos);
         }
 
-        public bool RecargarSaldo(int recarga)
+        public decimal CalcularTarifa(decimal tarifaBasica, DateTime fechaHora)
         {
-            int[] montosPermitidos = { 2000, 3000, 4000, 5000, 8000, 10000, 15000, 20000, 25000, 30000 };
+            return ObtenerTipo().CalcularTarifa(tarifaBasica, ObtenerHistorial(), fechaHora);
+        }
+
+        public int ViajesDelMes(DateTime fechaHora)
+        {
+            return ObtenerHistorial().ViajesDelMes(fechaHora);
+        }
+
+        public decimal CalcularTarifa(decimal tarifaBasica)
+        {
+            return ObtenerTipo().CalcularTarifa(tarifaBasica);
+        }
+
+        public bool RecargarSaldo(decimal recarga)
+        {
+            decimal[] montosPermitidos = { 2000m, 3000m, 4000m, 5000m, 8000m, 10000m, 15000m, 20000m, 25000m, 30000m };
 
             if (!montosPermitidos.Contains(recarga))
             {
@@ -73,23 +70,23 @@ namespace TarjetaSUBE
             return true;
         }
 
-        public void AcreditarCarga()
+        private void AcreditarCarga()
         {
-            int acreditar = Math.Min(SaldoMaximo - Saldo, SaldoPendiente);
+            decimal acreditar = Math.Min(SaldoMaximo - Saldo, SaldoPendiente);
 
-            if (acreditar > 0)
+            if (acreditar > 0m)
             {
                 Saldo += acreditar;
                 SaldoPendiente -= acreditar;
             }
         }
 
-        public bool PuedePagar(int monto)
+        public bool PuedePagar(decimal monto)
         {
             return Saldo - monto >= SaldoNegativoPermitido;
         }
 
-        public void DescontarSaldo(int saldoAdescontar)
+        public void DescontarSaldo(decimal saldoAdescontar)
         {
             if (!PuedePagar(saldoAdescontar))
                 return;
@@ -98,48 +95,24 @@ namespace TarjetaSUBE
             AcreditarCarga();
         }
 
-        public bool EsMedioBoleto()
+        public void RegistrarViaje(Boleto boleto)
         {
-            if (TarjetaTipo != null && TarjetaTipo.PorcentajeTarifa == 50)
-            {
-                return true;
-            }
-
-            return false;
+            Boletos.Add(boleto);
         }
 
-        public bool TieneLimiteDeViajesDiarios()
+        public bool EsNormal()
         {
-            if (TarjetaTipo == null)
-            {
-                return false;
-            }
-
-            switch (TarjetaTipo.PorcentajeTarifa)
-            {
-                case 50:
-                    return true;
-
-                case 0:
-                    string nombre = TarjetaTipo.Nombre.Trim().ToLower();
-                    return (nombre != "franquicia completa");
-
-                default:
-                    return false;
-            }
+            return ObtenerTipo() is Normal;
         }
 
-        public bool PasaronCincoMinutos(DateTime fechaHora)
+        public bool PuedeViajar(DateTime fechaHora)
         {
-            if (!EsMedioBoleto() || Boletos.Count == 0)
-            {
-                return true;
-            }
+            return ObtenerTipo().PuedeViajar(ObtenerHistorial(), fechaHora);
+        }
 
-            Boleto ultimoBoleto = Boletos[Boletos.Count - 1];
-            TimeSpan tiempoPasado = fechaHora - ultimoBoleto.FechayHora;
-
-            return tiempoPasado.TotalMinutes > 5;
+        public bool EsTrasbordo(string linea, DateTime fechaHora)
+        {
+            return ObtenerHistorial().EsTrasbordo(linea, fechaHora);
         }
     }
 }

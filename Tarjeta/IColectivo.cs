@@ -6,8 +6,9 @@ namespace TarjetaSUBE
     {
         int Id { get; }
         string Linea { get; }
+        decimal Tarifa { get; }
 
-        bool PagarCon(Tarjeta tarjeta);
-        bool PagarCon(Tarjeta tarjeta, DateTime fechaHora);
+        bool PagarCon(IMedioDePago medioDePago);
+        bool PagarCon(IMedioDePago medioDePago, DateTime fechaHora);
     }
 }

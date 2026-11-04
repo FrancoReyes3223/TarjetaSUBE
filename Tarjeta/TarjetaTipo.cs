@@ -1,27 +1,32 @@
+using System;
+
 namespace TarjetaSUBE
 {
-    public class TarjetaTipo : ITarjetaTipo
+    public abstract class TarjetaTipo(string nombre) : ITarjetaTipo
     {
         public int Id { get; set; }
-        public string Nombre { get; set; } = string.Empty;
+        public string Nombre { get; set; } = nombre;
 
-        // PorcentajeTarifa indica el porcentaje de la tarifa basica que se abona:
-        // 100 = 100% (Normal), 50 = 50% (Medio boleto), 0 = 0% (Gratuito / Franquicia completa)
-        public int PorcentajeTarifa { get; set; } = 100;
+        public abstract int PorcentajeTarifa { get; }
 
-        public TarjetaTipo()
+        public decimal CalcularTarifa(decimal tarifaBasica)
         {
+            return (tarifaBasica * PorcentajeTarifa) / 100m;
         }
 
-        public TarjetaTipo(string nombre, int porcentajeTarifa)
+        public virtual decimal CalcularTarifa(decimal tarifaBasica, HistorialViajes historial, DateTime fechaHora)
         {
-            Nombre = nombre;
-            PorcentajeTarifa = porcentajeTarifa;
+            return CalcularTarifa(tarifaBasica);
         }
 
-        public int CalcularTarifa(int tarifaBasica)
+        public virtual bool PuedeViajar(HistorialViajes historial, DateTime fechaHora)
         {
-            return (tarifaBasica * PorcentajeTarifa) / 100;
+            if (fechaHora.DayOfWeek == DayOfWeek.Saturday || fechaHora.DayOfWeek == DayOfWeek.Sunday)
+            {
+                return false;
+            }
+
+            return fechaHora.Hour >= 6 && fechaHora.Hour < 22;
         }
     }
 }
