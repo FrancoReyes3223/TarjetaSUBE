@@ -11,12 +11,12 @@ namespace TarjetaSUBE {
 
         public virtual decimal Tarifa => TarifaBasica;
 
-        public bool PagarCon(IMedioDePago medioDePago)
+        public bool PagarCon(ITarjetaTransporte medioDePago)
         {
             return PagarCon(medioDePago, DateTime.Now);
         }
 
-        public bool PagarCon(IMedioDePago medioDePago, DateTime fechaHora)
+        public bool PagarCon(ITarjetaTransporte medioDePago, DateTime fechaHora)
         {
             if (!medioDePago.PuedeViajar(fechaHora))
             {

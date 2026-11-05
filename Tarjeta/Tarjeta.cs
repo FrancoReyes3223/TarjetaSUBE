@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace TarjetaSUBE
 {
-    public class Tarjeta : IMedioDePago, ITarjetaRecargable
+    public class Tarjeta : ITarjetaTransporte, ITarjetaRecargable
     {
         public const decimal SaldoNegativoPermitido = -2000m;
         public const decimal SaldoMaximo = 56000m;
