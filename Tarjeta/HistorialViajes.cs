@@ -54,7 +54,7 @@ namespace TarjetaSUBE
                 return false;
             }
 
-            Boleto primerBoleto = boletos.LastOrDefault(b => !b.EsTrasbordo);
+            Boleto? primerBoleto = boletos.LastOrDefault(b => !b.EsTrasbordo);
             if (primerBoleto == null)
             {
                 return false;

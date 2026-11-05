@@ -83,7 +83,7 @@ namespace TarjetaSUBE
 
         public bool DevolverBici(IMedioDePago medioDePago, DateTime fechaHoraDevolucion)
         {
-            AlquilerBici alquilerActivo = Alquileres.LastOrDefault(a => a.TarjetaId == medioDePago.Id && a.EstaEnCurso());
+            AlquilerBici? alquilerActivo = Alquileres.LastOrDefault(a => a.TarjetaId == medioDePago.Id && a.EstaEnCurso());
 
             if (alquilerActivo == null || fechaHoraDevolucion < alquilerActivo.FechaRetiro)
             {

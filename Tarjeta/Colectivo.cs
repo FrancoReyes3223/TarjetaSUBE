@@ -7,7 +7,7 @@ namespace TarjetaSUBE {
         public const decimal TarifaBasica = 2150m;
 
         public int Id { get; set; }
-        public string Linea { get; set; }
+        public string Linea { get; set; } = string.Empty;
 
         public virtual decimal Tarifa => TarifaBasica;
 

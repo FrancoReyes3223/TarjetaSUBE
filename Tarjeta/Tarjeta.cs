@@ -10,7 +10,7 @@ namespace TarjetaSUBE
         public const decimal SaldoMaximo = 56000m;
 
         public int Id { get; set; }
-        public string NumeroTarjeta { get; set; }
+        public string NumeroTarjeta { get; set; } = string.Empty;
         public decimal Saldo { get; private set; }
         public decimal SaldoPendiente { get; private set; }
 
