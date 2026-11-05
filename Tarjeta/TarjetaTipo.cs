@@ -61,7 +61,7 @@ namespace TarjetaSUBE
             return (tarifaBasica * PorcentajeTarifa) / 100m;
         }
 
-        public decimal CalcularTarifa(decimal tarifaBasica, HistorialViajes historial, DateTime fechaHora)
+        public decimal CalcularTarifa(decimal tarifaBasica, IHistorialViajes historial, DateTime fechaHora)
         {
             if (!EsFranquicia)
             {
@@ -76,7 +76,7 @@ namespace TarjetaSUBE
             return CalcularTarifa(tarifaBasica);
         }
 
-        public bool PuedeViajar(HistorialViajes historial, DateTime fechaHora)
+        public bool PuedeViajar(IHistorialViajes historial, DateTime fechaHora)
         {
             if (!EsFranquicia)
             {

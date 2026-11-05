@@ -9,6 +9,8 @@ namespace TarjetaSUBE
         public const decimal SaldoNegativoPermitido = -2000m;
         public const decimal SaldoMaximo = 56000m;
 
+        private static readonly IReglaTrasbordo reglaTrasbordo = new ReglaTrasbordo();
+
         public int Id { get; set; }
         public string NumeroTarjeta { get; set; } = string.Empty;
         public decimal Saldo { get; private set; }
@@ -37,7 +39,7 @@ namespace TarjetaSUBE
             return TarjetaTipo ?? TarjetaTipo.Normal();
         }
 
-        private HistorialViajes ObtenerHistorial()
+        private IHistorialViajes ObtenerHistorial()
         {
             return new HistorialViajes(Boletos);
         }
@@ -112,7 +114,7 @@ namespace TarjetaSUBE
 
         public bool EsTrasbordo(string linea, DateTime fechaHora)
         {
-            return ObtenerHistorial().EsTrasbordo(linea, fechaHora);
+            return reglaTrasbordo.EsTrasbordo(ObtenerHistorial(), linea, fechaHora);
         }
     }
 }

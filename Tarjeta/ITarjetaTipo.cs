@@ -12,7 +12,7 @@ namespace TarjetaSUBE
         int? MinutosEntreViajes { get; }
 
         decimal CalcularTarifa(decimal tarifaBasica);
-        decimal CalcularTarifa(decimal tarifaBasica, HistorialViajes historial, DateTime fechaHora);
-        bool PuedeViajar(HistorialViajes historial, DateTime fechaHora);
+        decimal CalcularTarifa(decimal tarifaBasica, IHistorialViajes historial, DateTime fechaHora);
+        bool PuedeViajar(IHistorialViajes historial, DateTime fechaHora);
     }
 }
