@@ -72,7 +72,7 @@ namespace TarjetaSUBE.Tests
 		[Test]
 		public void Tarjetas_GuardarTarjetaConTipo_QuedaAsociadaCorrectamente()
 		{
-			var tipo = new MedioBoleto();
+			var tipo = TarjetaTipo.MedioBoleto();
 			Db.TarjetasTipo.Add(tipo);
 			Db.SaveChanges();
 
@@ -88,6 +88,26 @@ namespace TarjetaSUBE.Tests
 
 			Assert.That(guardada, Is.Not.Null);
 			Assert.That(guardada!.TarjetaTipoId, Is.EqualTo(tipo.Id));
+		}
+
+		[Test]
+		public void TarjetasTipo_GuardarTipoNuevoSinClaseNueva_SeRecuperaConSusAtributos()
+		{
+			Db.TarjetasTipo.Add(new TarjetaTipo
+			{
+				Nombre = "Boleto universitario",
+				PorcentajeTarifa = 75,
+				EsFranquicia = true,
+				ViajesDiariosConFranquicia = 1
+			});
+			Db.SaveChanges();
+
+			var guardado = Db.TarjetasTipo.Single(t => t.Nombre == "Boleto universitario");
+
+			Assert.That(guardado.PorcentajeTarifa, Is.EqualTo(75));
+			Assert.That(guardado.EsFranquicia, Is.True);
+			Assert.That(guardado.ViajesDiariosConFranquicia, Is.EqualTo(1));
+			Assert.That(guardado.MinutosEntreViajes, Is.Null);
 		}
 
 		[Test]

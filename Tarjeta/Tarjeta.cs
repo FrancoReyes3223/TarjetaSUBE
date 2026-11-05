@@ -34,7 +34,7 @@ namespace TarjetaSUBE
 
         private TarjetaTipo ObtenerTipo()
         {
-            return TarjetaTipo ?? new Normal();
+            return TarjetaTipo ?? TarjetaTipo.Normal();
         }
 
         private HistorialViajes ObtenerHistorial()
@@ -102,7 +102,7 @@ namespace TarjetaSUBE
 
         public bool EsNormal()
         {
-            return ObtenerTipo() is Normal;
+            return !ObtenerTipo().EsFranquicia;
         }
 
         public bool PuedeViajar(DateTime fechaHora)

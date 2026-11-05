@@ -14,7 +14,7 @@ namespace TarjetaSUBE.Tests
 			{
 				Id = 40,
 				NumeroTarjeta = "40404040",
-				TarjetaTipo = new Normal()
+				TarjetaTipo = TarjetaTipo.Normal()
 			};
 			tarjeta.RecargarSaldo(3000);
 
@@ -55,7 +55,7 @@ namespace TarjetaSUBE.Tests
 			var tarjeta = new Tarjeta
 			{
 				Id = 42,
-				TarjetaTipo = new MedioBoleto()
+				TarjetaTipo = TarjetaTipo.MedioBoleto()
 			};
 			tarjeta.RecargarSaldo(2000);
 
@@ -75,7 +75,7 @@ namespace TarjetaSUBE.Tests
 			var tarjeta = new Tarjeta
 			{
 				Id = 43,
-				TarjetaTipo = new BoletoGratuito()
+				TarjetaTipo = TarjetaTipo.BoletoGratuito()
 			};
 
 			new Colectivo { Linea = "K" }.PagarCon(tarjeta, martesALas10);
@@ -94,7 +94,7 @@ namespace TarjetaSUBE.Tests
 			var tarjeta = new Tarjeta
 			{
 				Id = 44,
-				TarjetaTipo = new FranquiciaCompleta()
+				TarjetaTipo = TarjetaTipo.FranquiciaCompleta()
 			};
 
 			new Colectivo { Linea = "K" }.PagarCon(tarjeta, martesALas10);

@@ -17,7 +17,7 @@ namespace TarjetaSUBE.Tests
 			{
 				Id = 50,
 				NumeroTarjeta = "50505050",
-				TarjetaTipo = new BoletoGratuito()
+				TarjetaTipo = TarjetaTipo.BoletoGratuito()
 			};
 			tarjeta.RecargarSaldo(3000);
 
@@ -34,10 +34,8 @@ namespace TarjetaSUBE.Tests
 			Assert.That(tarjeta.Saldo, Is.EqualTo(3000m - 2150m));
 		}
 
-		[TestCase(typeof(MedioBoleto))]
-		[TestCase(typeof(BoletoGratuito))]
-		[TestCase(typeof(FranquiciaCompleta))]
-		public void PagarCon_FranquiciasDeLunesAViernesDe6A22_PermiteViajar(Type tipoFranquicia)
+		[TestCaseSource(typeof(TiposDeTarjetaFuente), nameof(TiposDeTarjetaFuente.Franquicias))]
+		public void PagarCon_FranquiciasDeLunesAViernesDe6A22_PermiteViajar(TarjetaTipo tipoFranquicia)
 		{
 			// Resultado esperado: Todas las franquicias pueden viajar de lunes a viernes dentro del horario de 6:00 a 22:00.
 			var colectivo = new Colectivo();
@@ -47,13 +45,13 @@ namespace TarjetaSUBE.Tests
 			{
 				var tarjetaManiana = new Tarjeta
 				{
-					TarjetaTipo = (TarjetaTipo)Activator.CreateInstance(tipoFranquicia)!
+					TarjetaTipo = tipoFranquicia
 				};
 				tarjetaManiana.RecargarSaldo(3000);
 
 				var tarjetaNoche = new Tarjeta
 				{
-					TarjetaTipo = (TarjetaTipo)Activator.CreateInstance(tipoFranquicia)!
+					TarjetaTipo = tipoFranquicia
 				};
 				tarjetaNoche.RecargarSaldo(3000);
 
@@ -65,16 +63,14 @@ namespace TarjetaSUBE.Tests
 			}
 		}
 
-		[TestCase(typeof(MedioBoleto))]
-		[TestCase(typeof(BoletoGratuito))]
-		[TestCase(typeof(FranquiciaCompleta))]
-		public void PagarCon_FranquiciasAntesDeLas6ODespuesDeLas22_NoPermiteViajar(Type tipoFranquicia)
+		[TestCaseSource(typeof(TiposDeTarjetaFuente), nameof(TiposDeTarjetaFuente.Franquicias))]
+		public void PagarCon_FranquiciasAntesDeLas6ODespuesDeLas22_NoPermiteViajar(TarjetaTipo tipoFranquicia)
 		{
 			// Resultado esperado: Ninguna franquicia permite pagar un boleto antes de las 6:00 ni a partir de las 22:00
 			// (devuelve false y no genera boleto).
 			var tarjeta = new Tarjeta
 			{
-				TarjetaTipo = (TarjetaTipo)Activator.CreateInstance(tipoFranquicia)!
+				TarjetaTipo = tipoFranquicia
 			};
 			tarjeta.RecargarSaldo(3000);
 
@@ -90,16 +86,14 @@ namespace TarjetaSUBE.Tests
 			Assert.That(tarjeta.Boletos, Is.Empty);
 		}
 
-		[TestCase(typeof(MedioBoleto))]
-		[TestCase(typeof(BoletoGratuito))]
-		[TestCase(typeof(FranquiciaCompleta))]
-		public void PagarCon_FranquiciasEnSabadoODomingo_NoPermiteViajar(Type tipoFranquicia)
+		[TestCaseSource(typeof(TiposDeTarjetaFuente), nameof(TiposDeTarjetaFuente.Franquicias))]
+		public void PagarCon_FranquiciasEnSabadoODomingo_NoPermiteViajar(TarjetaTipo tipoFranquicia)
 		{
 			// Resultado esperado: Ninguna franquicia permite viajar los sabados ni los domingos,
 			// aun estando dentro del horario de 6:00 a 22:00 (devuelve false y no genera boleto).
 			var tarjeta = new Tarjeta
 			{
-				TarjetaTipo = (TarjetaTipo)Activator.CreateInstance(tipoFranquicia)!
+				TarjetaTipo = tipoFranquicia
 			};
 			tarjeta.RecargarSaldo(3000);
 
@@ -119,7 +113,7 @@ namespace TarjetaSUBE.Tests
 		{
 			// Resultado esperado: La tarjeta Normal no tiene restriccion horaria y puede viajar
 			// tanto de madrugada como los fines de semana.
-			var tarjeta = new Tarjeta { TarjetaTipo = new Normal() };
+			var tarjeta = new Tarjeta { TarjetaTipo = TarjetaTipo.Normal() };
 			tarjeta.RecargarSaldo(10000);
 
 			var colectivo = new Colectivo();
