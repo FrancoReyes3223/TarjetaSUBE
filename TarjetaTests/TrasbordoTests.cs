@@ -154,17 +154,14 @@ namespace TarjetaSUBE.Tests
 			Assert.That(tarjeta.Saldo, Is.EqualTo(5000m - 2150m - 2150m));
 		}
 
-		[TestCase(typeof(Normal))]
-		[TestCase(typeof(MedioBoleto))]
-		[TestCase(typeof(BoletoGratuito))]
-		[TestCase(typeof(FranquiciaCompleta))]
-		public void PagarCon_TodosLosTiposDeTarjeta_PuedenRealizarTrasbordo(Type tipoTarjeta)
+		[TestCaseSource(typeof(TiposDeTarjetaFuente), nameof(TiposDeTarjetaFuente.Todos))]
+		public void PagarCon_TodosLosTiposDeTarjeta_PuedenRealizarTrasbordo(TarjetaTipo tipoTarjeta)
 		{
 			// Resultado esperado: Todas las tarjetas sin excepcion pueden realizar trasbordos gratuitos ($0, EsTrasbordo = true)
 			// entre lineas distintas dentro de la hora y franja permitida.
 			var tarjeta = new Tarjeta
 			{
-				TarjetaTipo = (TarjetaTipo)Activator.CreateInstance(tipoTarjeta)!
+				TarjetaTipo = tipoTarjeta
 			};
 			tarjeta.RecargarSaldo(5000);
 
@@ -174,6 +171,21 @@ namespace TarjetaSUBE.Tests
 			Assert.That(tarjeta.Boletos[0].EsTrasbordo, Is.False);
 			Assert.That(tarjeta.Boletos[1].EsTrasbordo, Is.True);
 			Assert.That(tarjeta.Boletos[1].TotalAbonado, Is.EqualTo(0m));
+		}
+
+		[Test]
+		public void PagarCon_DeUrbanoAInterurbano_EsTrasbordoSinCosto()
+		{
+			var tarjeta = new Tarjeta();
+			tarjeta.RecargarSaldo(5000);
+
+			new Colectivo { Linea = "K" }.PagarCon(tarjeta, lunesALas10);
+			new ColectivoInterurbano { Linea = "Galvez" }.PagarCon(tarjeta, lunesALas10.AddMinutes(20));
+
+			Assert.That(tarjeta.Boletos[1].EsTrasbordo, Is.True);
+			Assert.That(tarjeta.Boletos[1].TarifaBasica, Is.EqualTo(3000m));
+			Assert.That(tarjeta.Boletos[1].TotalAbonado, Is.EqualTo(0m));
+			Assert.That(tarjeta.Saldo, Is.EqualTo(5000m - 2150m));
 		}
 	}
 }

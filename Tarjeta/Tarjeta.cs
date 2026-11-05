@@ -4,13 +4,15 @@ using System.Linq;
 
 namespace TarjetaSUBE
 {
-    public class Tarjeta : IMedioDePago, ITarjetaRecargable
+    public class Tarjeta : ITarjetaTransporte, ITarjetaRecargable
     {
         public const decimal SaldoNegativoPermitido = -2000m;
         public const decimal SaldoMaximo = 56000m;
 
+        private static readonly IReglaTrasbordo reglaTrasbordo = new ReglaTrasbordo();
+
         public int Id { get; set; }
-        public string NumeroTarjeta { get; set; }
+        public string NumeroTarjeta { get; set; } = string.Empty;
         public decimal Saldo { get; private set; }
         public decimal SaldoPendiente { get; private set; }
 
@@ -34,10 +36,10 @@ namespace TarjetaSUBE
 
         private TarjetaTipo ObtenerTipo()
         {
-            return TarjetaTipo ?? new Normal();
+            return TarjetaTipo ?? TarjetaTipo.Normal();
         }
 
-        private HistorialViajes ObtenerHistorial()
+        private IHistorialViajes ObtenerHistorial()
         {
             return new HistorialViajes(Boletos);
         }
@@ -102,7 +104,7 @@ namespace TarjetaSUBE
 
         public bool EsNormal()
         {
-            return ObtenerTipo() is Normal;
+            return !ObtenerTipo().EsFranquicia;
         }
 
         public bool PuedeViajar(DateTime fechaHora)
@@ -112,7 +114,7 @@ namespace TarjetaSUBE
 
         public bool EsTrasbordo(string linea, DateTime fechaHora)
         {
-            return ObtenerHistorial().EsTrasbordo(linea, fechaHora);
+            return reglaTrasbordo.EsTrasbordo(ObtenerHistorial(), linea, fechaHora);
         }
     }
 }

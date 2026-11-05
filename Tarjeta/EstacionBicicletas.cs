@@ -17,18 +17,27 @@ namespace TarjetaSUBE
             return Alquileres.Any(a => a.TarjetaId == medioDePago.Id && a.EstaEnCurso());
         }
 
-        public int MultasDelDia(IMedioDePago medioDePago, DateTime fechaHora)
+        public bool PagoTarifaDelDia(IMedioDePago medioDePago, DateTime fechaHora)
         {
-            return Alquileres.Count(a =>
+            return Alquileres.Any(a =>
                 a.TarjetaId == medioDePago.Id &&
                 a.FechaRetiro.Date == fechaHora.Date &&
-                a.ExcedioTiempoMaximo());
+                a.MontoAbonado > 0m);
+        }
+
+        public int MultasPendientes(IMedioDePago medioDePago)
+        {
+            return AlquileresConMultaPendiente(medioDePago).Count();
         }
 
         public decimal CalcularCostoRetiro(IMedioDePago medioDePago, DateTime fechaHora)
         {
-            int multas = MultasDelDia(medioDePago, fechaHora);
-            return TarifaDiaria + (multas * ValorMulta);
+            if (PagoTarifaDelDia(medioDePago, fechaHora))
+            {
+                return 0m;
+            }
+
+            return TarifaDiaria + (MultasPendientes(medioDePago) * ValorMulta);
         }
 
         public bool RetirarBici(IMedioDePago medioDePago)
@@ -43,6 +52,7 @@ namespace TarjetaSUBE
                 return false;
             }
 
+            bool debePagar = !PagoTarifaDelDia(medioDePago, fechaHora);
             decimal costo = CalcularCostoRetiro(medioDePago, fechaHora);
 
             if (!medioDePago.PuedePagar(costo))
@@ -50,7 +60,15 @@ namespace TarjetaSUBE
                 return false;
             }
 
-            medioDePago.DescontarSaldo(costo);
+            if (debePagar)
+            {
+                medioDePago.DescontarSaldo(costo);
+
+                foreach (AlquilerBici alquiler in AlquileresConMultaPendiente(medioDePago).ToList())
+                {
+                    alquiler.MultaCobrada = true;
+                }
+            }
 
             AlquilerBici nuevoAlquiler = new AlquilerBici
             {
@@ -65,7 +83,7 @@ namespace TarjetaSUBE
 
         public bool DevolverBici(IMedioDePago medioDePago, DateTime fechaHoraDevolucion)
         {
-            AlquilerBici alquilerActivo = Alquileres.LastOrDefault(a => a.TarjetaId == medioDePago.Id && a.EstaEnCurso());
+            AlquilerBici? alquilerActivo = Alquileres.LastOrDefault(a => a.TarjetaId == medioDePago.Id && a.EstaEnCurso());
 
             if (alquilerActivo == null || fechaHoraDevolucion < alquilerActivo.FechaRetiro)
             {
@@ -74,6 +92,11 @@ namespace TarjetaSUBE
 
             alquilerActivo.FechaDevolucion = fechaHoraDevolucion;
             return true;
+        }
+
+        private IEnumerable<AlquilerBici> AlquileresConMultaPendiente(IMedioDePago medioDePago)
+        {
+            return Alquileres.Where(a => a.TarjetaId == medioDePago.Id && a.TieneMultaPendiente());
         }
     }
 }

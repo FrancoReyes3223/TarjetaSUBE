@@ -185,7 +185,7 @@ namespace TarjetaSUBE.Tests
 			{
 				Id = 10,
 				NumeroTarjeta = "10101010",
-				TarjetaTipo = new FranquiciaCompleta()
+				TarjetaTipo = TarjetaTipo.FranquiciaCompleta()
 			};
 
 			var colectivo = new Colectivo();
@@ -204,7 +204,7 @@ namespace TarjetaSUBE.Tests
 			{
 				Id = 20,
 				NumeroTarjeta = "20202020",
-				TarjetaTipo = new Normal()
+				TarjetaTipo = TarjetaTipo.Normal()
 			};
 			tarjetaNormal.RecargarSaldo(3000);
 
@@ -212,7 +212,7 @@ namespace TarjetaSUBE.Tests
 			{
 				Id = 21,
 				NumeroTarjeta = "21212121",
-				TarjetaTipo = new MedioBoleto()
+				TarjetaTipo = TarjetaTipo.MedioBoleto()
 			};
 			tarjetaMedio.RecargarSaldo(2000);
 
@@ -236,7 +236,7 @@ namespace TarjetaSUBE.Tests
 			{
 				Id = 30,
 				NumeroTarjeta = "30303030",
-				TarjetaTipo = new BoletoGratuito()
+				TarjetaTipo = TarjetaTipo.BoletoGratuito()
 			};
 
 			var colectivo = new Colectivo();
@@ -250,12 +250,36 @@ namespace TarjetaSUBE.Tests
 		[Test]
 		public void TarjetaTipo_NuevoTipoSinCrearClase_CalculaTarifaCorrectamente()
 		{
-			var tipoUniversitario = new MedioBoleto { Nombre = "Medio boleto universitario" };
+			var tipoUniversitario = new TarjetaTipo
+			{
+				Nombre = "Boleto universitario",
+				PorcentajeTarifa = 75,
+				EsFranquicia = true,
+				ViajesDiariosConFranquicia = 1
+			};
 			var tarjeta = new Tarjeta { TarjetaTipo = tipoUniversitario };
+			tarjeta.RecargarSaldo(5000);
+			var colectivo = new Colectivo { Linea = "K" };
 
-			decimal tarifa = tarjeta.CalcularTarifa(2150);
+			Assert.That(tarjeta.CalcularTarifa(2150), Is.EqualTo(1612.5m));
+			Assert.That(colectivo.PagarCon(tarjeta, martesALas10), Is.True);
+			Assert.That(colectivo.PagarCon(tarjeta, martesALas10.AddHours(2)), Is.True);
+			Assert.That(tarjeta.Boletos[0].TipoTarjeta, Is.EqualTo("Boleto universitario"));
+			Assert.That(tarjeta.Boletos[0].TotalAbonado, Is.EqualTo(1612.5m));
+			Assert.That(tarjeta.Boletos[1].TotalAbonado, Is.EqualTo(2150m));
+		}
 
-			Assert.That(tarifa, Is.EqualTo(1075));
+		[Test]
+		public void PagarCon_MedioBoleto_PermiteViajarAlCumplirseExactamenteCincoMinutos()
+		{
+			var tarjeta = new Tarjeta { TarjetaTipo = TarjetaTipo.MedioBoleto() };
+			tarjeta.RecargarSaldo(3000);
+			var colectivo = new Colectivo();
+
+			Assert.That(colectivo.PagarCon(tarjeta, martesALas10), Is.True);
+			Assert.That(colectivo.PagarCon(tarjeta, martesALas10.AddMinutes(4).AddSeconds(59)), Is.False);
+			Assert.That(colectivo.PagarCon(tarjeta, martesALas10.AddMinutes(5)), Is.True);
+			Assert.That(tarjeta.Boletos, Has.Count.EqualTo(2));
 		}
 
 		[Test]
@@ -265,7 +289,7 @@ namespace TarjetaSUBE.Tests
 			{
 				Id = 40,
 				NumeroTarjeta = "40404040",
-				TarjetaTipo = new MedioBoleto()
+				TarjetaTipo = TarjetaTipo.MedioBoleto()
 			};
 			tarjeta.RecargarSaldo(3000);
 
@@ -291,7 +315,7 @@ namespace TarjetaSUBE.Tests
 			{
 				Id = 41,
 				NumeroTarjeta = "41414141",
-				TarjetaTipo = new MedioBoleto()
+				TarjetaTipo = TarjetaTipo.MedioBoleto()
 			};
 			tarjeta.RecargarSaldo(5000);
 

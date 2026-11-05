@@ -30,7 +30,7 @@ namespace TarjetaSUBE.Tests
 			var tarjeta = new Tarjeta
 			{
 				Id = 50,
-				TarjetaTipo = new Normal()
+				TarjetaTipo = TarjetaTipo.Normal()
 			};
 			tarjeta.RecargarSaldo(5000);
 
@@ -69,7 +69,7 @@ namespace TarjetaSUBE.Tests
 			var tarjeta = new Tarjeta
 			{
 				Id = 52,
-				TarjetaTipo = new MedioBoleto()
+				TarjetaTipo = TarjetaTipo.MedioBoleto()
 			};
 			tarjeta.RecargarSaldo(2000);
 
@@ -81,20 +81,19 @@ namespace TarjetaSUBE.Tests
 			Assert.That(tarjeta.Saldo, Is.EqualTo(2000 - 1500));
 		}
 
-		[TestCase(typeof(BoletoGratuito), "Boleto gratuito estudiantil")]
-		[TestCase(typeof(FranquiciaCompleta), "Franquicia completa")]
-		public void PagarCon_FranquiciaGratuita_NoAbonaNada(Type tipoTarjeta, string nombreTipo)
+		[TestCaseSource(typeof(TiposDeTarjetaFuente), nameof(TiposDeTarjetaFuente.FranquiciasGratuitas))]
+		public void PagarCon_FranquiciaGratuita_NoAbonaNada(TarjetaTipo tipoTarjeta)
 		{
 			var tarjeta = new Tarjeta
 			{
 				Id = 53,
-				TarjetaTipo = (TarjetaTipo)Activator.CreateInstance(tipoTarjeta)!
+				TarjetaTipo = tipoTarjeta
 			};
 
 			bool pago = new ColectivoInterurbano { Linea = "Galvez" }.PagarCon(tarjeta, martesALas10);
 
 			Assert.That(pago, Is.True);
-			Assert.That(tarjeta.Boletos[0].TipoTarjeta, Is.EqualTo(nombreTipo));
+			Assert.That(tarjeta.Boletos[0].TipoTarjeta, Is.EqualTo(tipoTarjeta.Nombre));
 			Assert.That(tarjeta.Boletos[0].TarifaBasica, Is.EqualTo(3000));
 			Assert.That(tarjeta.Boletos[0].TotalAbonado, Is.EqualTo(0));
 			Assert.That(tarjeta.Saldo, Is.EqualTo(0));
@@ -128,7 +127,7 @@ namespace TarjetaSUBE.Tests
 		[Test]
 		public void PagarCon_MedioBoleto_NoPermiteViajarAntesDePasarCincoMinutos()
 		{
-			var tarjeta = new Tarjeta { TarjetaTipo = new MedioBoleto() };
+			var tarjeta = new Tarjeta { TarjetaTipo = TarjetaTipo.MedioBoleto() };
 			tarjeta.RecargarSaldo(10000);
 
 			var colectivo = new ColectivoInterurbano();
@@ -142,7 +141,7 @@ namespace TarjetaSUBE.Tests
 		[Test]
 		public void PagarCon_MedioBoleto_TercerViajeDelDiaAbonaTarifaInterurbanaCompleta()
 		{
-			var tarjeta = new Tarjeta { TarjetaTipo = new MedioBoleto() };
+			var tarjeta = new Tarjeta { TarjetaTipo = TarjetaTipo.MedioBoleto() };
 			tarjeta.RecargarSaldo(10000);
 
 			var colectivo = new ColectivoInterurbano();
@@ -160,7 +159,7 @@ namespace TarjetaSUBE.Tests
 		[Test]
 		public void PagarCon_BoletoGratuito_TercerViajeDelDiaAbonaTarifaInterurbanaCompleta()
 		{
-			var tarjeta = new Tarjeta { TarjetaTipo = new BoletoGratuito() };
+			var tarjeta = new Tarjeta { TarjetaTipo = TarjetaTipo.BoletoGratuito() };
 			tarjeta.RecargarSaldo(5000);
 
 			var colectivo = new ColectivoInterurbano();

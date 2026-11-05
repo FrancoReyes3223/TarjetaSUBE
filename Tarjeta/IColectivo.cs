@@ -8,7 +8,7 @@ namespace TarjetaSUBE
         string Linea { get; }
         decimal Tarifa { get; }
 
-        bool PagarCon(IMedioDePago medioDePago);
-        bool PagarCon(IMedioDePago medioDePago, DateTime fechaHora);
+        bool PagarCon(ITarjetaTransporte medioDePago);
+        bool PagarCon(ITarjetaTransporte medioDePago, DateTime fechaHora);
     }
 }

@@ -23,7 +23,7 @@ namespace TarjetaSUBE.Tests
 		[TestCase(120, 1612.5)]
 		public void CalcularTarifa_TarjetaNormal_AplicaDescuentoSegunViajesDelMes(int viajesPrevios, decimal tarifaEsperada)
 		{
-			var tarjeta = new Tarjeta { TarjetaTipo = new Normal() };
+			var tarjeta = new Tarjeta { TarjetaTipo = TarjetaTipo.Normal() };
 			AgregarViajes(tarjeta, viajesPrevios, inicioDeOctubre);
 
 			decimal tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 10, 31, 20, 0, 0));
@@ -78,7 +78,7 @@ namespace TarjetaSUBE.Tests
 		[Test]
 		public void CalcularTarifa_MedioBoleto_NoAplicaUsoFrecuente()
 		{
-			var tarjeta = new Tarjeta { TarjetaTipo = new MedioBoleto() };
+			var tarjeta = new Tarjeta { TarjetaTipo = TarjetaTipo.MedioBoleto() };
 			AgregarViajes(tarjeta, 40, inicioDeOctubre);
 
 			decimal tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 10, 31, 10, 0, 0));
@@ -86,11 +86,10 @@ namespace TarjetaSUBE.Tests
 			Assert.That(tarifa, Is.EqualTo(1075));
 		}
 
-		[TestCase(typeof(BoletoGratuito))]
-		[TestCase(typeof(FranquiciaCompleta))]
-		public void CalcularTarifa_FranquiciaGratuita_NoAplicaUsoFrecuente(Type tipoTarjeta)
+		[TestCaseSource(typeof(TiposDeTarjetaFuente), nameof(TiposDeTarjetaFuente.FranquiciasGratuitas))]
+		public void CalcularTarifa_FranquiciaGratuita_NoAplicaUsoFrecuente(TarjetaTipo tipoTarjeta)
 		{
-			var tarjeta = new Tarjeta { TarjetaTipo = (TarjetaTipo)Activator.CreateInstance(tipoTarjeta)! };
+			var tarjeta = new Tarjeta { TarjetaTipo = tipoTarjeta };
 			AgregarViajes(tarjeta, 85, inicioDeOctubre);
 
 			decimal tarifa = tarjeta.CalcularTarifa(Colectivo.TarifaBasica, new DateTime(2026, 10, 31, 10, 0, 0));
@@ -102,9 +101,9 @@ namespace TarjetaSUBE.Tests
 		public void EsNormal_SegunTipoDeTarjeta()
 		{
 			Assert.That(new Tarjeta().EsNormal(), Is.True);
-			Assert.That(new Tarjeta { TarjetaTipo = new Normal() }.EsNormal(), Is.True);
-			Assert.That(new Tarjeta { TarjetaTipo = new MedioBoleto() }.EsNormal(), Is.False);
-			Assert.That(new Tarjeta { TarjetaTipo = new FranquiciaCompleta() }.EsNormal(), Is.False);
+			Assert.That(new Tarjeta { TarjetaTipo = TarjetaTipo.Normal() }.EsNormal(), Is.True);
+			Assert.That(new Tarjeta { TarjetaTipo = TarjetaTipo.MedioBoleto() }.EsNormal(), Is.False);
+			Assert.That(new Tarjeta { TarjetaTipo = TarjetaTipo.FranquiciaCompleta() }.EsNormal(), Is.False);
 		}
 
 		[Test]
@@ -139,6 +138,23 @@ namespace TarjetaSUBE.Tests
 			Assert.That(tarjeta.Boletos[28].TotalAbonado, Is.EqualTo(2150));
 			Assert.That(tarjeta.Boletos[29].TotalAbonado, Is.EqualTo(1720));
 			Assert.That(tarjeta.Saldo, Is.EqualTo(10000 - 2150 - 1720));
+		}
+
+		[Test]
+		public void PagarCon_TarjetaNormal_LosTrasbordosNoCuentanComoViaje()
+		{
+			var tarjeta = new Tarjeta();
+			AgregarViajes(tarjeta, 27, inicioDeOctubre);
+			tarjeta.RecargarSaldo(10000);
+			DateTime sabadoALas20 = new DateTime(2026, 10, 31, 20, 0, 0);
+
+			new Colectivo { Linea = "K" }.PagarCon(tarjeta, sabadoALas20);
+			new Colectivo { Linea = "102" }.PagarCon(tarjeta, sabadoALas20.AddMinutes(20));
+			new Colectivo { Linea = "K" }.PagarCon(tarjeta, sabadoALas20.AddHours(2));
+
+			Assert.That(tarjeta.Boletos[28].EsTrasbordo, Is.True);
+			Assert.That(tarjeta.ViajesDelMes(sabadoALas20), Is.EqualTo(29));
+			Assert.That(tarjeta.Boletos[29].TotalAbonado, Is.EqualTo(2150));
 		}
 	}
 }

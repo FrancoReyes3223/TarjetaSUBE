@@ -25,12 +25,5 @@ public class TransporteDbContext(DbContextOptions<TransporteDbContext> options) 
             .HasForeignKey(t => t.TarjetaTipoId);
 
         modelBuilder.Entity<ColectivoInterurbano>();
-
-        modelBuilder.Entity<TarjetaTipo>()
-            .HasDiscriminator<string>("Tipo")
-            .HasValue<Normal>("Normal")
-            .HasValue<MedioBoleto>("MedioBoleto")
-            .HasValue<BoletoGratuito>("BoletoGratuito")
-            .HasValue<FranquiciaCompleta>("FranquiciaCompleta");
     }
 }
