@@ -15,7 +15,7 @@ namespace TarjetaSUBE
 
         public int ViajesDelMes(DateTime fechaHora)
         {
-            return boletos.Count(b => b.FechayHora.Year == fechaHora.Year && b.FechayHora.Month == fechaHora.Month);
+            return boletos.Count(b => b.FechayHora.Year == fechaHora.Year && b.FechayHora.Month == fechaHora.Month && !b.EsTrasbordo);
         }
 
         public int ViajesDelDia(DateTime fechaHora)

@@ -51,6 +51,18 @@ namespace TarjetaSUBE.Tests
 		}
 
 		[Test]
+		public void ViajesDelMes_NoCuentaTrasbordosNiOtrosMeses()
+		{
+			var historial = Historial(
+				new Boleto { FechayHora = lunesALas10.AddMonths(-1) },
+				new Boleto { FechayHora = lunesALas10 },
+				new Boleto { FechayHora = lunesALas10.AddMinutes(20), EsTrasbordo = true },
+				new Boleto { FechayHora = lunesALas10.AddDays(5) });
+
+			Assert.That(historial.ViajesDelMes(lunesALas10), Is.EqualTo(2));
+		}
+
+		[Test]
 		public void PasaronMinutosDesdeUltimoViaje_SinViajes_DevuelveTrue()
 		{
 			Assert.That(Historial().PasaronMinutosDesdeUltimoViaje(lunesALas10, 5), Is.True);

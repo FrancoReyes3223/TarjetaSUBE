@@ -139,5 +139,22 @@ namespace TarjetaSUBE.Tests
 			Assert.That(tarjeta.Boletos[29].TotalAbonado, Is.EqualTo(1720));
 			Assert.That(tarjeta.Saldo, Is.EqualTo(10000 - 2150 - 1720));
 		}
+
+		[Test]
+		public void PagarCon_TarjetaNormal_LosTrasbordosNoCuentanComoViaje()
+		{
+			var tarjeta = new Tarjeta();
+			AgregarViajes(tarjeta, 27, inicioDeOctubre);
+			tarjeta.RecargarSaldo(10000);
+			DateTime sabadoALas20 = new DateTime(2026, 10, 31, 20, 0, 0);
+
+			new Colectivo { Linea = "K" }.PagarCon(tarjeta, sabadoALas20);
+			new Colectivo { Linea = "102" }.PagarCon(tarjeta, sabadoALas20.AddMinutes(20));
+			new Colectivo { Linea = "K" }.PagarCon(tarjeta, sabadoALas20.AddHours(2));
+
+			Assert.That(tarjeta.Boletos[28].EsTrasbordo, Is.True);
+			Assert.That(tarjeta.ViajesDelMes(sabadoALas20), Is.EqualTo(29));
+			Assert.That(tarjeta.Boletos[29].TotalAbonado, Is.EqualTo(2150));
+		}
 	}
 }
