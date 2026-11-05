@@ -172,5 +172,20 @@ namespace TarjetaSUBE.Tests
 			Assert.That(tarjeta.Boletos[1].EsTrasbordo, Is.True);
 			Assert.That(tarjeta.Boletos[1].TotalAbonado, Is.EqualTo(0m));
 		}
+
+		[Test]
+		public void PagarCon_DeUrbanoAInterurbano_EsTrasbordoSinCosto()
+		{
+			var tarjeta = new Tarjeta();
+			tarjeta.RecargarSaldo(5000);
+
+			new Colectivo { Linea = "K" }.PagarCon(tarjeta, lunesALas10);
+			new ColectivoInterurbano { Linea = "Galvez" }.PagarCon(tarjeta, lunesALas10.AddMinutes(20));
+
+			Assert.That(tarjeta.Boletos[1].EsTrasbordo, Is.True);
+			Assert.That(tarjeta.Boletos[1].TarifaBasica, Is.EqualTo(3000m));
+			Assert.That(tarjeta.Boletos[1].TotalAbonado, Is.EqualTo(0m));
+			Assert.That(tarjeta.Saldo, Is.EqualTo(5000m - 2150m));
+		}
 	}
 }

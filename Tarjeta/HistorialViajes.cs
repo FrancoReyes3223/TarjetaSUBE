@@ -33,7 +33,7 @@ namespace TarjetaSUBE
             Boleto ultimoBoleto = boletos[boletos.Count - 1];
             TimeSpan tiempoPasado = fechaHora - ultimoBoleto.FechayHora;
 
-            return tiempoPasado.TotalMinutes > minutos;
+            return tiempoPasado.TotalMinutes >= minutos;
         }
 
         public bool EsTrasbordo(string linea, DateTime fechaHora)

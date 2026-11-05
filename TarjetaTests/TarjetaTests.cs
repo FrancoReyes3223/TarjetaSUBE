@@ -270,6 +270,19 @@ namespace TarjetaSUBE.Tests
 		}
 
 		[Test]
+		public void PagarCon_MedioBoleto_PermiteViajarAlCumplirseExactamenteCincoMinutos()
+		{
+			var tarjeta = new Tarjeta { TarjetaTipo = TarjetaTipo.MedioBoleto() };
+			tarjeta.RecargarSaldo(3000);
+			var colectivo = new Colectivo();
+
+			Assert.That(colectivo.PagarCon(tarjeta, martesALas10), Is.True);
+			Assert.That(colectivo.PagarCon(tarjeta, martesALas10.AddMinutes(4).AddSeconds(59)), Is.False);
+			Assert.That(colectivo.PagarCon(tarjeta, martesALas10.AddMinutes(5)), Is.True);
+			Assert.That(tarjeta.Boletos, Has.Count.EqualTo(2));
+		}
+
+		[Test]
 		public void PagarCon_MedioBoleto_NoPermiteViajarAntesDePasarCincoMinutos()
 		{
 			var tarjeta = new Tarjeta
